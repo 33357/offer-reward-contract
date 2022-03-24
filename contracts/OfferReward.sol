@@ -20,9 +20,9 @@ contract OfferReward is IOfferReward {
 
     mapping(uint256 => address) public answerPublisher;
 
-    mapping(uint256 => mapping(uint256 => uint256)) public offer_answer_map;
+    mapping(uint256 => mapping(uint256 => uint256)) public offerAnswerMap;
 
-    mapping(uint256 => uint256) public offer_answer_length;
+    mapping(uint256 => uint256) public offerAnswerLength;
 
     mapping(address => uint256) public publishOfferNum;
 
@@ -30,9 +30,9 @@ contract OfferReward is IOfferReward {
 
     mapping(address => uint256) public rewardAnswerNum;
 
-    uint256 public offerLength;
+    uint256 public offerLength = 1;
 
-    uint256 public answerLength;
+    uint256 public answerLength = 1;
 
     uint256 public minFinshTime = 3 days;
 
@@ -57,9 +57,9 @@ contract OfferReward is IOfferReward {
     function publishAnswer(uint256 offerId, string memory newAnswerUrl) external {
         answerUrl[answerLength] = newAnswerUrl;
         answerPublisher[answerLength] = msg.sender;
-        offer_answer_map[offerId][offer_answer_length[offerId]] = answerLength;
+        offerAnswerMap[offerId][offerAnswerLength[offerId]] = answerLength;
         answerLength++;
-        offer_answer_length[offerId]++;
+        offerAnswerLength[offerId]++;
     }
 
     function finishOffer(uint256 offerId) external {
@@ -72,10 +72,11 @@ contract OfferReward is IOfferReward {
         }
     }
 
-    function rewardAndFinishOffer(uint256 offerId, uint256 answerId) external {
+    function rewardAndFinishOffer(uint256 offerId, uint256 offerAnswerId) external {
         require(offerPublisher[offerId] == msg.sender);
         require(!offerFinshed[offerId]);
-        require(answerPublisher[answerId] != address(0));
+        uint256 answerId = offerAnswerMap[offerId][offerAnswerId];
+        require(answerId != 0 && answerPublisher[answerId] != address(0));
         offerFinshed[offerId] = true;
         rewardOfferNum[msg.sender]++;
         rewardAnswerNum[answerPublisher[answerId]]++;
