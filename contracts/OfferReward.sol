@@ -4,31 +4,11 @@ pragma solidity ^0.8.12;
 import "./interfaces/IOfferReward.sol";
 
 contract OfferReward is IOfferReward {
-    mapping(uint256 => string) public offerUrl;
+    mapping(uint256 => Offer) public offerMap;
 
-    mapping(uint256 => uint256) public offerValue;
+    mapping(uint256 => Answer) public answerMap;
 
-    mapping(uint256 => uint256) public offerFinshTime;
-
-    mapping(uint256 => address) public offerPublisher;
-
-    mapping(uint256 => bool) public offerFinshed;
-
-    mapping(address => uint256) public ownered;
-
-    mapping(uint256 => string) public answerUrl;
-
-    mapping(uint256 => address) public answerPublisher;
-
-    mapping(uint256 => mapping(uint256 => uint256)) public offerAnswerMap;
-
-    mapping(uint256 => uint256) public offerAnswerLength;
-
-    mapping(address => uint256) public publishOfferNum;
-
-    mapping(address => uint256) public rewardOfferNum;
-
-    mapping(address => uint256) public rewardAnswerNum;
+    mapping(address => Publisher) public publisherMap;
 
     uint256 public offerLength = 1;
 
@@ -36,7 +16,11 @@ contract OfferReward is IOfferReward {
 
     uint256 public minFinshTime = 3 days;
 
-    constructor() {}
+    address public feeAddress;
+
+    constructor() {
+        feeAddress = msg.sender;
+    }
 
     /* ================ UTIL FUNCTIONS ================ */
 
@@ -44,56 +28,86 @@ contract OfferReward is IOfferReward {
 
     /* ================ TRANSACTION FUNCTIONS ================ */
 
-    function publishOffer(string memory newOfferUrl, uint256 finishTime) external payable {
+    function publishOffer(
+        string memory description,
+        string memory offerUrl,
+        uint256 finishTime
+    ) external payable {
         require(finishTime - block.timestamp >= minFinshTime);
-        offerUrl[offerLength] = newOfferUrl;
-        offerValue[offerLength] = msg.value;
-        offerPublisher[offerLength] = msg.sender;
-        offerFinshTime[offerLength] = finishTime;
-        publishOfferNum[msg.sender]++;
+        offerMap[offerLength] = Offer({
+            description: description,
+            url: offerUrl,
+            value: msg.value,
+            publisher: msg.sender,
+            finishTime: finishTime,
+            answerIdList: new uint256[](0),
+            finished: false
+        });
+        publisherMap[msg.sender].publishOfferNum++;
+        emit OfferPublished(msg.sender, offerLength, msg.value, finishTime);
         offerLength++;
     }
 
-    function publishAnswer(uint256 offerId, string memory newAnswerUrl) external {
-        answerUrl[answerLength] = newAnswerUrl;
-        answerPublisher[answerLength] = msg.sender;
-        offerAnswerMap[offerId][offerAnswerLength[offerId]] = answerLength;
+    function publishAnswer(
+        string memory description,
+        uint256 offerId,
+        string memory answerUrl
+    ) external {
+        answerMap[answerLength] = Answer({description: description, url: answerUrl, publisher: msg.sender});
+        offerMap[offerId].answerIdList.push(answerLength);
+        publisherMap[msg.sender].publishAnswerNum++;
+        emit AnswerPublished(msg.sender, answerLength);
         answerLength++;
-        offerAnswerLength[offerId]++;
     }
 
     function finishOffer(uint256 offerId) external {
-        require(offerPublisher[offerId] == msg.sender);
-        require(!offerFinshed[offerId]);
-        offerFinshed[offerId] = true;
-        if (offerValue[offerId] > 0) {
-            (bool success, ) = msg.sender.call{value: offerValue[offerId]}("");
+        require(offerMap[offerId].publisher == msg.sender);
+        require(!offerMap[offerId].finished);
+        offerMap[offerId].finished = true;
+        if (offerMap[offerId].value > 0) {
+            (bool success, ) = msg.sender.call{value: offerMap[offerId].value}("");
             require(success);
         }
+        emit OfferFinished(offerId);
     }
 
     function rewardAndFinishOffer(uint256 offerId, uint256 offerAnswerId) external {
-        require(offerPublisher[offerId] == msg.sender);
-        require(!offerFinshed[offerId]);
-        uint256 answerId = offerAnswerMap[offerId][offerAnswerId];
-        require(answerId != 0 && answerPublisher[answerId] != address(0));
-        offerFinshed[offerId] = true;
-        rewardOfferNum[msg.sender]++;
-        rewardAnswerNum[answerPublisher[answerId]]++;
-        if (offerValue[offerId] > 0) {
-            (bool success, ) = answerPublisher[answerId].call{value: offerValue[offerId]}("");
+        require(offerMap[offerId].publisher == msg.sender);
+        require(!offerMap[offerId].finished);
+        uint256 answerId = offerMap[offerId].answerIdList[offerAnswerId];
+        require(answerId != 0 && answerMap[answerId].publisher != address(0));
+        offerMap[offerId].finished = true;
+        publisherMap[msg.sender].rewardOfferNum++;
+        publisherMap[answerMap[answerId].publisher].rewardAnswerNum++;
+        if (offerMap[offerId].value > 0) {
+            uint256 feeAmount = offerMap[offerId].value / 100;
+            (bool success, ) = feeAddress.call{value: feeAmount}("");
+            require(success);
+            uint256 valueAmount = offerMap[offerId].value - feeAmount;
+            (success, ) = answerMap[answerId].publisher.call{value: valueAmount}("");
             require(success);
         }
+        emit OfferRewardedAndFinished(offerId, offerAnswerId);
     }
 
-    function changeOffer(uint256 offerId, string memory newOfferUrl) external {
-        require(offerPublisher[offerId] == msg.sender);
-        offerUrl[offerId] = newOfferUrl;
+    function changeOfferURL(uint256 offerId, string memory offerUrl) external {
+        require(offerMap[offerId].publisher == msg.sender);
+        offerMap[offerId].url = offerUrl;
     }
 
-    function changeAnswer(uint256 answerId, string memory newAnswerUrl) external {
-        require(answerPublisher[answerId] == msg.sender);
-        answerUrl[answerId] = newAnswerUrl;
+    function changeOfferDescription(uint256 offerId, string memory description) external {
+        require(offerMap[offerId].publisher == msg.sender);
+        offerMap[offerId].description = description;
+    }
+
+    function changeAnswerURL(uint256 answerId, string memory answerUrl) external {
+        require(answerMap[answerId].publisher == msg.sender);
+        answerMap[answerId].url = answerUrl;
+    }
+
+    function changeAnswerDescription(uint256 answerId, string memory description) external {
+        require(answerMap[answerId].publisher == msg.sender);
+        answerMap[answerId].description = description;
     }
 
     /* ================ ADMIN FUNCTIONS ================ */
