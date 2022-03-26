@@ -92,21 +92,25 @@ contract OfferReward is IOfferReward {
 
     function changeOfferUrl(uint256 offerId, string memory offerUrl) external {
         require(offerMap[offerId].publisher == msg.sender);
+        emit OfferUrlChanged(offerId, offerMap[offerId].url);
         offerMap[offerId].url = offerUrl;
     }
 
     function changeOfferDescription(uint256 offerId, string memory description) external {
         require(offerMap[offerId].publisher == msg.sender);
+        emit OfferDescriptionChanged(offerId, offerMap[offerId].description);
         offerMap[offerId].description = description;
     }
 
     function changeAnswerUrl(uint256 answerId, string memory answerUrl) external {
         require(answerMap[answerId].publisher == msg.sender);
+        emit AnswerUrlChanged(answerId, answerMap[answerId].url);
         answerMap[answerId].url = answerUrl;
     }
 
     function changeAnswerDescription(uint256 answerId, string memory description) external {
         require(answerMap[answerId].publisher == msg.sender);
+        emit AnswerDescriptionChanged(answerId, answerMap[answerId].description);
         answerMap[answerId].description = description;
     }
 

@@ -12,6 +12,14 @@ interface IOfferReward {
 
     event OfferRewardedAndFinished(uint256 indexed offerId, uint256 offerAnswerId);
 
+    event AnswerUrlChanged(uint256 indexed answerId, string originalUrl);
+
+    event AnswerDescriptionChanged(uint256 indexed answerId, string originalDescription);
+
+    event OfferUrlChanged(uint256 indexed offerId, string originalUrl);
+
+    event OfferDescriptionChanged(uint256 indexed offerId, string originalDescription);
+
     /* ================ STRUCTS ================ */
 
     struct Offer {
