@@ -1,4 +1,4 @@
-# uniswap-v2-contract
+# offer-reward-contract
 
 ## Sample Scripts
 ### Install dependencies
