@@ -57,11 +57,11 @@ interface IOfferReward {
 
     function rewardAndFinishOffer(uint256 offerId, uint256 answerId) external;
 
-    function changeOfferURL(uint256 offerId, string memory offerUrl) external;
+    function changeOfferUrl(uint256 offerId, string memory offerUrl) external;
 
     function changeOfferDescription(uint256 offerId, string memory description) external;
 
-    function changeAnswerURL(uint256 answerId, string memory answerUrl) external;
+    function changeAnswerUrl(uint256 answerId, string memory answerUrl) external;
 
     function changeAnswerDescription(uint256 answerId, string memory description) external;
 
