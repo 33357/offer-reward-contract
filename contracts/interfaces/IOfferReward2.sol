@@ -29,6 +29,7 @@ interface IOfferReward2 {
         uint256 startTime;
         uint256 finishTime;
         uint256 publisher;
+        uint256 random;
         uint256[] answerIdList;
         bool finished;
     }

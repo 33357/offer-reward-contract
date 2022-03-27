@@ -2,7 +2,7 @@
 pragma solidity ^0.8.12;
 
 import "./interfaces/IOfferReward2.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "./interfaces/IOfferReward2NFT.sol";
 
 contract OfferReward is IOfferReward2 {
     mapping(uint256 => Offer) public offerMap;
@@ -19,18 +19,43 @@ contract OfferReward is IOfferReward2 {
 
     address public feeAddress;
 
-    uint256 public answerNum = 30;
+    uint256 public answerFee = 0.0001 ether;
 
-    uint256 public askNum = 100;
+    uint256 public minOfferValue = 0.002 ether;
 
-    IERC721 public offerRewardNFT;
+    uint256 public maxAnswerAmount = 20;
+
+    uint256 public halfAskAmount = 50;
+
+    IOfferRewardNFT public offerRewardNFT;
 
     constructor(address offerRewardNFTAddress) {
-        offerRewardNFT = IERC721(offerRewardNFTAddress);
+        offerRewardNFT = IOfferRewardNFT(offerRewardNFTAddress);
         feeAddress = msg.sender;
     }
 
     /* ================ UTIL FUNCTIONS ================ */
+
+    function _random() internal view returns (uint256) {
+        if (offerRewardNFT.tokenAmount() <= halfAskAmount * 2) {
+            return halfAskAmount;
+        } else {
+            uint256 random = (uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, offerLength))) %
+                (offerRewardNFT.tokenAmount() - halfAskAmount * 2)) + halfAskAmount;
+            return random;
+        }
+    }
+
+    function _canPublishAnswer(uint256 offerId, uint256 tokenId) internal view returns (bool) {
+        if (offerMap[offerId].answerIdList.length < maxAnswerAmount) {
+            return true;
+        } else if (tokenId >= offerMap[offerId].random && tokenId - offerMap[offerId].random < halfAskAmount) {
+            return true;
+        } else if (tokenId < offerMap[offerId].random && offerMap[offerId].random - tokenId < halfAskAmount) {
+            return true;
+        }
+        return false;
+    }
 
     /* ================ VIEW FUNCTIONS ================ */
 
@@ -44,6 +69,7 @@ contract OfferReward is IOfferReward2 {
     ) external payable {
         require(tokenId != 0 && offerRewardNFT.ownerOf(tokenId) == msg.sender);
         require(finishTime - block.timestamp >= minFinshTime);
+        require(msg.value >= minOfferValue);
         offerMap[offerLength] = Offer({
             description: description,
             url: offerUrl,
@@ -51,6 +77,7 @@ contract OfferReward is IOfferReward2 {
             publisher: tokenId,
             startTime: block.timestamp,
             finishTime: finishTime,
+            random: _random(),
             answerIdList: new uint256[](0),
             finished: false
         });
@@ -66,6 +93,7 @@ contract OfferReward is IOfferReward2 {
         string memory answerUrl
     ) external {
         require(tokenId != 0 && offerRewardNFT.ownerOf(tokenId) == msg.sender);
+        require(_canPublishAnswer(offerId, tokenId));
         answerMap[answerLength] = Answer({description: description, url: answerUrl, publisher: tokenId});
         offerMap[offerId].answerIdList.push(answerLength);
         publisherMap[tokenId].publishAnswerAmount++;
@@ -77,10 +105,11 @@ contract OfferReward is IOfferReward2 {
         require(offerRewardNFT.ownerOf(offerMap[offerId].publisher) == msg.sender);
         require(!offerMap[offerId].finished);
         offerMap[offerId].finished = true;
-        if (offerMap[offerId].value > 0) {
-            (bool success, ) = msg.sender.call{value: offerMap[offerId].value}("");
-            require(success);
-        }
+        uint256 feeAmount = offerMap[offerId].answerIdList.length * answerFee;
+        (bool success, ) = feeAddress.call{value: feeAmount}("");
+        require(success);
+        (success, ) = msg.sender.call{value: offerMap[offerId].value - feeAmount}("");
+        require(success);
         emit OfferFinished(offerId);
     }
 

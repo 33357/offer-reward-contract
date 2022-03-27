@@ -1,14 +1,12 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
+import "./interfaces/IOfferReward2NFT.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract OfferRewardNFT is ERC721, ERC721Enumerable{
-    
-    event NFTClaimed(address owner, uint256 tokenId);
-
-    uint256 tokenAmount = 1;
+contract OfferRewardNFT is ERC721, ERC721Enumerable, IOfferRewardNFT {
+    uint256 private _tokenAmount = 1;
     string public baseURI;
 
     constructor() ERC721("OfferRewardNFT", "OfferRewardNFT") {}
@@ -20,8 +18,8 @@ contract OfferRewardNFT is ERC721, ERC721Enumerable{
     }
 
     function _awardNFT(address receiver) internal returns (uint256) {
-        uint256 newId = tokenAmount;
-        tokenAmount++;
+        uint256 newId = _tokenAmount;
+        _tokenAmount++;
         _safeMint(receiver, newId);
         return newId;
     }
@@ -35,12 +33,11 @@ contract OfferRewardNFT is ERC721, ERC721Enumerable{
     }
 
     /* ================ VIEW FUNCTIONS ================ */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC721Enumerable)
-        returns (bool)
-    {
+    function tokenAmount() external view override returns (uint256) {
+        return _tokenAmount;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable,IERC165) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

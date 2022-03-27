@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-interface IOfferRewardNFT {
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
+interface IOfferRewardNFT is IERC721 {
     /* ================ EVENTS ================ */
 
     event NFTClaimed(address owner, uint256 tokenId);
@@ -11,6 +13,8 @@ interface IOfferRewardNFT {
 
 
     /* ================ VIEW FUNCTIONS ================ */
+
+    function tokenAmount() external view returns (uint256);
 
     /* ================ TRANSACTION FUNCTIONS ================ */
 
