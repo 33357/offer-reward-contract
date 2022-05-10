@@ -4,74 +4,70 @@ pragma solidity ^0.8.12;
 interface IOfferReward {
     /* ================ EVENTS ================ */
 
-    event OfferPublished(address indexed publisher, uint256 indexed offerId, uint256 value, uint256 finishTime);
+    event OfferPublished(
+        uint48 indexed offerId,
+        address indexed publisher,
+        string title,
+        string content,
+        string[] tagList
+    );
 
-    event AnswerPublished(address indexed publisher, uint256 indexed answerId);
+    event AnswerPublished(uint48 indexed answerId, uint48 indexed OfferId, address indexed publisher, string content);
 
     event OfferFinished(uint256 indexed offerId);
-
-    event OfferRewardedAndFinished(uint256 indexed offerId, uint256 offerAnswerId);
-
-    event AnswerUrlChanged(uint256 indexed answerId, string originalUrl);
-
-    event AnswerDescriptionChanged(uint256 indexed answerId, string originalDescription);
-
-    event OfferUrlChanged(uint256 indexed offerId, string originalUrl);
-
-    event OfferDescriptionChanged(uint256 indexed offerId, string originalDescription);
 
     /* ================ STRUCTS ================ */
 
     struct Offer {
-        string description;
-        string url;
         uint256 value;
-        uint256 finishTime;
+        uint48 offerBlock;
+        uint48 finishTime;
         address publisher;
-        uint256[] answerIdList;
-        bool finished;
+        uint48[] answerIdList;
     }
 
     struct Answer {
-        string description;
-        string url;
+        uint48 answerBlock;
+        uint48 offerId;
         address publisher;
     }
 
     struct Publisher {
-        uint256 publishOfferNum;
-        uint256 rewardOfferNum;
-        uint256 publishAnswerNum;
-        uint256 rewardAnswerNum;
+        uint256 publishOfferAmount;
+        uint256 publishOfferValue;
+        uint256 rewardOfferAmount;
+        uint256 rewardOfferValue;
+        uint256 publishAnswerAmount;
+        uint256 rewardAnswerAmount;
+        uint256 rewardAnswerValue;
     }
 
     /* ================ VIEW FUNCTIONS ================ */
 
+    function getTagHash(string calldata tag) external pure returns (bytes32);
+
     /* ================ TRANSACTION FUNCTIONS ================ */
 
     function publishOffer(
-        string memory description,
-        string memory offerUrl,
-        uint256 finishTime
+        string calldata title,
+        string calldata content,
+        string[] calldata tagList,
+        uint48 finishTime
     ) external payable;
 
-    function publishAnswer(
-        string memory description,
-        uint256 offerId,
-        string memory answerUrl
-    ) external;
+    function publishAnswer(uint48 offerId, string calldata content) external;
 
-    function finishOffer(uint256 offerId) external;
+    function finishOffer(uint48 offerId, uint48 answerId) external;
 
-    function rewardAndFinishOffer(uint256 offerId, uint256 answerId) external;
+    function changeOffer(
+        uint48 offerId,
+        string calldata title,
+        string calldata content,
+        string[] calldata tagList,
+        uint48 finishTime
+    ) external payable;
 
-    function changeOfferUrl(uint256 offerId, string memory offerUrl) external;
-
-    function changeOfferDescription(uint256 offerId, string memory description) external;
-
-    function changeAnswerUrl(uint256 answerId, string memory answerUrl) external;
-
-    function changeAnswerDescription(uint256 answerId, string memory description) external;
+    function changeAnswer(uint48 answerId, string calldata content) external;
 
     /* ================ ADMIN FUNCTIONS ================ */
 }
