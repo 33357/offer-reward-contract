@@ -52,7 +52,11 @@ interface IOfferReward {
 
     function batchPublisher(address[] calldata publisherAddressList) external view returns (Publisher[] memory);
 
-    function batchTagOfferId(bytes32 tagHash, uint48 start,uint48 length) external view returns (uint48[] memory);
+    function batchTagOfferId(
+        bytes32 tagHash,
+        uint48 start,
+        uint48 length
+    ) external view returns (uint48[] memory);
 
     /* ================ TRANSACTION FUNCTIONS ================ */
 
