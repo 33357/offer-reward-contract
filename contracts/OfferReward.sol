@@ -2,8 +2,9 @@
 pragma solidity ^0.8.12;
 
 import "./interfaces/IOfferReward.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract OfferReward is IOfferReward {
+contract OfferReward is IOfferReward,Ownable{
     mapping(uint48 => Offer) public offerMap;
 
     mapping(bytes32 => uint48[]) public tagHashMap;
@@ -16,7 +17,7 @@ contract OfferReward is IOfferReward {
 
     uint48 public answerLength = 0;
 
-    uint256 public minFinshTime = 3 days;
+    uint48 public minFinshTime = 1 days;
 
     uint256 public feeRate = 500;
 
@@ -98,6 +99,7 @@ contract OfferReward is IOfferReward {
         } else if (answerId > 0) {
             require(offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
             require(answerMap[answerId].offerId == offerId, "OfferReward: not answer");
+            require(offerMap[offerId].publisher != answerMap[answerId].publisher, "OfferReward: you are the publisher");
             uint256 feeAmount = (offerMap[offerId].value * feeRate) / 10000;
             uint256 rewardAmount = offerMap[offerId].value - feeAmount;
             publisherMap[offerMap[offerId].publisher].rewardOfferAmount++;
@@ -145,4 +147,24 @@ contract OfferReward is IOfferReward {
     }
 
     /* ================ ADMIN FUNCTIONS ================ */
+
+    function setFeeRate(uint256 newFeeRate) external onlyOwner {
+        feeRate = newFeeRate;
+    }
+
+    function setFeeAddress(address newFeeAddress) external onlyOwner {
+        feeAddress = newFeeAddress;
+    }
+
+    function setMinOfferValue(uint256 newMinOfferValue) external onlyOwner {
+        minOfferValue = newMinOfferValue;
+    }
+
+    function setAnswerFee(uint256 newAnswerFee) external onlyOwner {
+        answerFee = newAnswerFee;
+    }
+
+    function setMinFinshTime(uint48 newMinFinshTime) external onlyOwner {
+        minFinshTime = newMinFinshTime;
+    }
 }
