@@ -3,7 +3,7 @@ import {task} from 'hardhat/config';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import * as utils from '../utils';
 
-const contract = 'Example';
+const contract = 'OfferReward';
 const taskName = `${contract}:verify`;
 
 task(taskName, `verify ${contract}`).setAction(
@@ -13,10 +13,10 @@ task(taskName, `verify ${contract}`).setAction(
     );
 
     utils.log.info(
-      `verify ${contract},implAddress: ${deployment.Example.implAddress}`
+      `verify ${contract},implAddress: ${deployment[contract].implAddress}`
     );
     await hre.run('verify:verify', {
-      address: deployment.Example.implAddress,
+      address: deployment[contract].implAddress,
       constructorArguments: [],
     });
   }

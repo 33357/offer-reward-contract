@@ -72,8 +72,7 @@ export interface ContractInfo {
 }
 
 export interface Deployment {
-  ExampleUpgradeable: ContractInfo;
-  Example: ContractInfo;
+  OfferReward: ContractInfo;
 }
 
 export interface DeploymentFull {

@@ -12,9 +12,9 @@ interface IOfferReward {
         string[] tagList
     );
 
-    event AnswerPublished(uint48 indexed answerId, uint48 indexed OfferId, address indexed publisher, string content);
+    event AnswerPublished(uint48 indexed answerId, uint48 indexed offerId, address indexed publisher, string content);
 
-    event OfferFinished(uint256 indexed offerId);
+    event OfferFinished(uint48 indexed offerId);
 
     /* ================ STRUCTS ================ */
 
@@ -33,12 +33,12 @@ interface IOfferReward {
     }
 
     struct Publisher {
-        uint256 publishOfferAmount;
+        uint48 publishOfferAmount;
+        uint48 rewardOfferAmount;
+        uint48 publishAnswerAmount;
+        uint48 rewardAnswerAmount;
         uint256 publishOfferValue;
-        uint256 rewardOfferAmount;
         uint256 rewardOfferValue;
-        uint256 publishAnswerAmount;
-        uint256 rewardAnswerAmount;
         uint256 rewardAnswerValue;
     }
 

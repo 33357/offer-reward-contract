@@ -11,7 +11,7 @@ import {
   log,
 } from '../utils';
 
-const contract = 'Example';
+const contract = 'OfferReward';
 const taskName = `${contract}:deploy`;
 
 task(taskName, `Deploy ${contract}`)
@@ -52,7 +52,7 @@ task(taskName, `Deploy ${contract}`)
 
     const deployment = await getDeployment(chainId);
 
-    deployment.Example = {
+    deployment[contract] = {
       proxyAddress: contractProxyAddress,
       implAddress: contractImplAddress,
       version: contractVersion,
