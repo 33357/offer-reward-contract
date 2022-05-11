@@ -55,6 +55,26 @@ contract OfferReward is IOfferReward, Ownable {
         return answerList;
     }
 
+    function batchPublisher(address[] calldata publisherAddressList) public view override returns (Publisher[] memory) {
+        Publisher[] memory publisherList = new Publisher[](publisherAddressList.length);
+        for (uint48 i = 0; i < publisherAddressList.length; i++) {
+            publisherList[i] = publisherMap[publisherAddressList[i]];
+        }
+        return publisherList;
+    }
+
+    function batchTagOfferId(
+        bytes32 tagHash,
+        uint48 start,
+        uint48 length
+    ) public view override returns (uint48[] memory) {
+        uint48[] memory offerIdList = new uint48[](length);
+        for (uint48 i = 0; i < length; i++) {
+            offerIdList[i] = tagHashMap[tagHash][start + i];
+        }
+        return offerIdList;
+    }
+
     /* ================ TRANSACTION FUNCTIONS ================ */
 
     function publishOffer(
