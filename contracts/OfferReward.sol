@@ -4,7 +4,7 @@ pragma solidity ^0.8.12;
 import "./interfaces/IOfferReward.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract OfferReward is IOfferReward,Ownable{
+contract OfferReward is IOfferReward, Ownable {
     mapping(uint48 => Offer) public offerMap;
 
     mapping(bytes32 => uint48[]) public tagHashMap;
@@ -62,13 +62,7 @@ contract OfferReward is IOfferReward,Ownable{
         for (uint256 i = 0; i < tagList.length; i++) {
             tagHashMap[getTagHash(tagList[i])].push(offerLength);
         }
-        emit OfferPublished(
-            offerLength,
-            msg.sender,
-            title,
-            content,
-            tagList
-        );
+        emit OfferPublished(offerLength, msg.sender, title, content, tagList);
     }
 
     function publishAnswer(uint48 offerId, string calldata content) external override {
@@ -85,6 +79,7 @@ contract OfferReward is IOfferReward,Ownable{
             require(block.timestamp > offerMap[offerId].finishTime, "OfferReward: not over finishTime");
             uint256 feeAmount = offerMap[offerId].value - offerMap[offerId].answerIdList.length * answerFee;
             if (feeAmount >= offerMap[offerId].value) {
+                feeAmount = offerMap[offerId].value;
                 offerMap[offerId].value = 0;
                 (bool success, ) = feeAddress.call{value: feeAmount}("");
                 require(success, "OfferReward: send fee failed");
@@ -131,13 +126,7 @@ contract OfferReward is IOfferReward,Ownable{
         if (msg.value > 0) {
             offerMap[offerId].value += msg.value;
         }
-        emit OfferPublished(
-            offerId,
-            offerMap[offerId].publisher,
-            title,
-            content,
-            tagList
-        );
+        emit OfferPublished(offerId, offerMap[offerId].publisher, title, content, tagList);
     }
 
     function changeAnswer(uint48 answerId, string calldata content) external override {
