@@ -39,6 +39,22 @@ contract OfferReward is IOfferReward, Ownable {
         return keccak256(abi.encodePacked(tag));
     }
 
+    function batchOffer(uint48[] calldata offerIdList) public view override returns (Offer[] memory) {
+        Offer[] memory offerList = new Offer[](offerIdList.length);
+        for (uint48 i = 0; i < offerIdList.length; i++) {
+            offerList[i] = offerMap[offerIdList[i]];
+        }
+        return offerList;
+    }
+
+    function batchAnswer(uint48[] calldata answerIdList) public view override returns (Answer[] memory) {
+        Answer[] memory answerList = new Answer[](answerIdList.length);
+        for (uint48 i = 0; i < answerIdList.length; i++) {
+            answerList[i] = answerMap[answerIdList[i]];
+        }
+        return answerList;
+    }
+
     /* ================ TRANSACTION FUNCTIONS ================ */
 
     function publishOffer(

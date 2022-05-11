@@ -46,6 +46,10 @@ interface IOfferReward {
 
     function getTagHash(string calldata tag) external pure returns (bytes32);
 
+    function batchOffer(uint48[] calldata offerIdList) external view returns (Offer[] memory);
+
+    function batchAnswer(uint48[] calldata answerIdList) external view returns (Answer[] memory);
+
     /* ================ TRANSACTION FUNCTIONS ================ */
 
     function publishOffer(
