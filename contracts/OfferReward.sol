@@ -25,7 +25,7 @@ contract OfferReward is IOfferReward, Ownable {
 
     uint256 public minOfferValue = 0.005 ether;
 
-    uint256 public answerFee = 0.001 ether;
+    uint256 public answerFee = 0.0002 ether;
 
     constructor() {
         feeAddress = msg.sender;
