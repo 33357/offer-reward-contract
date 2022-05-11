@@ -19,7 +19,7 @@ contract OfferReward is IOfferReward, Ownable {
 
     uint48 public minFinshTime = 1 days;
 
-    uint256 public feeRate = 500;
+    uint48 public feeRate = 500;
 
     address public feeAddress;
 
@@ -179,7 +179,7 @@ contract OfferReward is IOfferReward, Ownable {
 
     /* ================ ADMIN FUNCTIONS ================ */
 
-    function setFeeRate(uint256 newFeeRate) external override onlyOwner {
+    function setFeeRate(uint48 newFeeRate) external override onlyOwner {
         feeRate = newFeeRate;
     }
 

@@ -84,7 +84,7 @@ interface IOfferReward {
 
     /* ================ ADMIN FUNCTIONS ================ */
 
-    function setFeeRate(uint256 newFeeRate) external;
+    function setFeeRate(uint48 newFeeRate) external;
 
     function setFeeAddress(address newFeeAddress) external;
 
