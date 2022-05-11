@@ -25,7 +25,7 @@ contract OfferReward is IOfferReward, Ownable {
 
     uint256 public minOfferValue = 0.005 ether;
 
-    uint256 public answerFee = 0.0002 ether;
+    uint256 public answerFee = 0.0005 ether;
 
     constructor() {
         feeAddress = msg.sender;
@@ -107,6 +107,7 @@ contract OfferReward is IOfferReward, Ownable {
     }
 
     function publishAnswer(uint48 offerId, string calldata content) external override {
+        require(offerId <= offerLength,"OfferReward: offer is not exit");
         answerLength++;
         answerMap[answerLength] = Answer({answerBlock: uint48(block.number), offerId: offerId, publisher: msg.sender});
         offerMap[offerId].answerIdList.push(answerLength);
@@ -155,12 +156,14 @@ contract OfferReward is IOfferReward, Ownable {
         string calldata content,
         string[] calldata tagList
     ) external override {
+        require(offerMap[offerId].value > 0, "OfferReward: offer is finished");
         require(offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
         offerMap[offerId].offerBlock = uint48(block.number);
         emit OfferPublished(offerId, offerMap[offerId].publisher, title, content, tagList);
     }
 
     function changeOfferValue(uint48 offerId, uint48 finishTime) external payable override {
+        require(offerMap[offerId].value > 0, "OfferReward: offer is finished");
         require(offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
         require(finishTime >= offerMap[offerId].finishTime, "OfferReward: finishTime can not be less than before");
         if (finishTime > offerMap[offerId].finishTime) {
