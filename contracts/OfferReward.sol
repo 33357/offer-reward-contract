@@ -46,7 +46,7 @@ contract OfferReward is IOfferReward,Ownable{
         string calldata content,
         string[] calldata tagList,
         uint48 finishTime
-    ) external payable {
+    ) external payable override {
         require(finishTime - block.timestamp >= minFinshTime, "OfferReward: finishTime is too short");
         require(msg.value > minOfferValue, "OfferReward: value is too low");
         offerLength++;
@@ -71,7 +71,7 @@ contract OfferReward is IOfferReward,Ownable{
         );
     }
 
-    function publishAnswer(uint48 offerId, string calldata content) external {
+    function publishAnswer(uint48 offerId, string calldata content) external override {
         answerLength++;
         answerMap[answerLength] = Answer({answerBlock: uint48(block.number), offerId: offerId, publisher: msg.sender});
         offerMap[offerId].answerIdList.push(answerLength);
@@ -121,7 +121,7 @@ contract OfferReward is IOfferReward,Ownable{
         string calldata content,
         string[] calldata tagList,
         uint48 finishTime
-    ) external payable {
+    ) external payable override {
         require(offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
         require(finishTime >= offerMap[offerId].finishTime, "OfferReward: finishTime can not be less than before");
         offerMap[offerId].offerBlock = uint48(block.number);
@@ -140,7 +140,7 @@ contract OfferReward is IOfferReward,Ownable{
         );
     }
 
-    function changeAnswer(uint48 answerId, string calldata content) external {
+    function changeAnswer(uint48 answerId, string calldata content) external override {
         require(answerMap[answerId].publisher == msg.sender, "OfferReward: you are not the publisher");
         answerMap[answerId].answerBlock = uint48(block.number);
         emit AnswerPublished(answerId, answerMap[answerId].offerId, answerMap[answerId].publisher, content);
@@ -148,23 +148,23 @@ contract OfferReward is IOfferReward,Ownable{
 
     /* ================ ADMIN FUNCTIONS ================ */
 
-    function setFeeRate(uint256 newFeeRate) external onlyOwner {
+    function setFeeRate(uint256 newFeeRate) external override onlyOwner {
         feeRate = newFeeRate;
     }
 
-    function setFeeAddress(address newFeeAddress) external onlyOwner {
+    function setFeeAddress(address newFeeAddress) external override onlyOwner {
         feeAddress = newFeeAddress;
     }
 
-    function setMinOfferValue(uint256 newMinOfferValue) external onlyOwner {
+    function setMinOfferValue(uint256 newMinOfferValue) external override onlyOwner {
         minOfferValue = newMinOfferValue;
     }
 
-    function setAnswerFee(uint256 newAnswerFee) external onlyOwner {
+    function setAnswerFee(uint256 newAnswerFee) external override onlyOwner {
         answerFee = newAnswerFee;
     }
 
-    function setMinFinshTime(uint48 newMinFinshTime) external onlyOwner {
+    function setMinFinshTime(uint48 newMinFinshTime) external override onlyOwner {
         minFinshTime = newMinFinshTime;
     }
 }

@@ -70,4 +70,14 @@ interface IOfferReward {
     function changeAnswer(uint48 answerId, string calldata content) external;
 
     /* ================ ADMIN FUNCTIONS ================ */
+
+    function setFeeRate(uint256 newFeeRate) external;
+
+    function setFeeAddress(address newFeeAddress) external;
+
+    function setMinOfferValue(uint256 newMinOfferValue) external;
+
+    function setAnswerFee(uint256 newAnswerFee) external;
+
+    function setMinFinshTime(uint48 newMinFinshTime) external;
 }
