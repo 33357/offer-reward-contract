@@ -46,13 +46,13 @@ interface IOfferReward {
 
     function getTagHash(string calldata tag) external pure returns (bytes32);
 
-    function batchOffer(uint48[] calldata offerIdList) external view returns (Offer[] memory);
+    function getOfferList(uint48[] calldata offerIdList) external view returns (Offer[] memory);
 
-    function batchAnswer(uint48[] calldata answerIdList) external view returns (Answer[] memory);
+    function getAnswerList(uint48[] calldata answerIdList) external view returns (Answer[] memory);
 
-    function batchPublisher(address[] calldata publisherAddressList) external view returns (Publisher[] memory);
+    function getPublisherList(address[] calldata publisherAddressList) external view returns (Publisher[] memory);
 
-    function batchTagOfferId(
+    function getOfferIdListByTagHash(
         bytes32 tagHash,
         uint48 start,
         uint48 length
@@ -71,13 +71,14 @@ interface IOfferReward {
 
     function finishOffer(uint48 offerId, uint48 answerId) external;
 
-    function changeOffer(
+    function changeOfferData(
         uint48 offerId,
         string calldata title,
         string calldata content,
-        string[] calldata tagList,
-        uint48 finishTime
-    ) external payable;
+        string[] calldata tagList
+    ) external;
+
+    function changeOfferValue(uint48 offerId, uint48 finishTime) external payable;
 
     function changeAnswer(uint48 answerId, string calldata content) external;
 

@@ -21,22 +21,22 @@ export interface OfferRewardClient {
 
   getTagHash(tag: string, config?: CallOverrides): Promise<BytesLike>;
 
-  batchOffer(
+  getOfferList(
     offerIdList: number[],
     config?: CallOverrides
   ): Promise<OfferRewardModel.Offer[]>;
 
-  batchAnswer(
+  getAnswerList(
     answerIdList: number[],
     config?: CallOverrides
   ): Promise<OfferRewardModel.Answer[]>;
 
-  batchPublisher(
+  getPublisherList(
     publisherAddressList: string[],
     config?: CallOverrides
   ): Promise<OfferRewardModel.Publisher[]>;
 
-  batchTagOfferId(
+  getOfferIdListByTagHash(
     tagHash: BytesLike,
     start: number,
     length: number,
@@ -67,15 +67,21 @@ export interface OfferRewardClient {
     callback?: Function
   ): Promise<OfferRewardModel.OfferFinishedEvent>;
 
-  changeOffer(
+  changeOfferData(
     offerId: number,
     title: string,
     content: string,
     tagList: string[],
-    finishTime: number,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferPublishedEvent>;
+
+  changeOfferValue(
+    offerId: number,
+    finishTime: number,
+    config?: PayableOverrides,
+    callback?: Function
+  ): Promise<void>;
 
   changeAnswer(
     answerId: number,
@@ -83,4 +89,8 @@ export interface OfferRewardClient {
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.AnswerPublishedEvent>;
+
+  /* ================ UTILS FUNCTIONS ================ */
+
+  tagHash(tag: string): string;
 }

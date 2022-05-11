@@ -33,6 +33,22 @@ export WAIT_NUM=1
 export GAS_PRICE=1
 ```
 
+#### bscTest
+``` bash
+export ENV_FILE='./envs/.env.bscTest'
+export NETWORK_ID=97
+export WAIT_NUM=1
+export GAS_PRICE=10
+```
+
+#### bsc
+``` bash
+export ENV_FILE='./envs/.env.bsc'
+export NETWORK_ID=56
+export WAIT_NUM=1
+export GAS_PRICE=5
+```
+
 #### rinkeby
 ``` bash
 export ENV_FILE='./envs/env.rinkeby'

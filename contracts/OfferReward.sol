@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract OfferReward is IOfferReward, Ownable {
     mapping(uint48 => Offer) public offerMap;
 
-    mapping(bytes32 => uint48[]) public tagHashMap;
+    mapping(bytes32 => uint48[]) public tagHash_OfferIdListMap;
 
     mapping(uint48 => Answer) public answerMap;
 
@@ -39,7 +39,7 @@ contract OfferReward is IOfferReward, Ownable {
         return keccak256(abi.encodePacked(tag));
     }
 
-    function batchOffer(uint48[] calldata offerIdList) public view override returns (Offer[] memory) {
+    function getOfferList(uint48[] calldata offerIdList) public view override returns (Offer[] memory) {
         Offer[] memory offerList = new Offer[](offerIdList.length);
         for (uint48 i = 0; i < offerIdList.length; i++) {
             offerList[i] = offerMap[offerIdList[i]];
@@ -47,7 +47,7 @@ contract OfferReward is IOfferReward, Ownable {
         return offerList;
     }
 
-    function batchAnswer(uint48[] calldata answerIdList) public view override returns (Answer[] memory) {
+    function getAnswerList(uint48[] calldata answerIdList) public view override returns (Answer[] memory) {
         Answer[] memory answerList = new Answer[](answerIdList.length);
         for (uint48 i = 0; i < answerIdList.length; i++) {
             answerList[i] = answerMap[answerIdList[i]];
@@ -55,7 +55,12 @@ contract OfferReward is IOfferReward, Ownable {
         return answerList;
     }
 
-    function batchPublisher(address[] calldata publisherAddressList) public view override returns (Publisher[] memory) {
+    function getPublisherList(address[] calldata publisherAddressList)
+        public
+        view
+        override
+        returns (Publisher[] memory)
+    {
         Publisher[] memory publisherList = new Publisher[](publisherAddressList.length);
         for (uint48 i = 0; i < publisherAddressList.length; i++) {
             publisherList[i] = publisherMap[publisherAddressList[i]];
@@ -63,14 +68,14 @@ contract OfferReward is IOfferReward, Ownable {
         return publisherList;
     }
 
-    function batchTagOfferId(
+    function getOfferIdListByTagHash(
         bytes32 tagHash,
         uint48 start,
         uint48 length
     ) public view override returns (uint48[] memory) {
         uint48[] memory offerIdList = new uint48[](length);
         for (uint48 i = 0; i < length; i++) {
-            offerIdList[i] = tagHashMap[tagHash][start + i];
+            offerIdList[i] = tagHash_OfferIdListMap[tagHash][start + i];
         }
         return offerIdList;
     }
@@ -84,7 +89,7 @@ contract OfferReward is IOfferReward, Ownable {
         uint48 finishTime
     ) external payable override {
         require(finishTime - block.timestamp >= minFinshTime, "OfferReward: finishTime is too short");
-        require(msg.value > minOfferValue, "OfferReward: value is too low");
+        require(msg.value >= minOfferValue, "OfferReward: value is too low");
         offerLength++;
         offerMap[offerLength] = Offer({
             value: msg.value,
@@ -96,7 +101,7 @@ contract OfferReward is IOfferReward, Ownable {
         publisherMap[msg.sender].publishOfferAmount++;
         publisherMap[msg.sender].publishOfferValue += msg.value;
         for (uint256 i = 0; i < tagList.length; i++) {
-            tagHashMap[getTagHash(tagList[i])].push(offerLength);
+            tagHash_OfferIdListMap[getTagHash(tagList[i])].push(offerLength);
         }
         emit OfferPublished(offerLength, msg.sender, title, content, tagList);
     }
@@ -112,25 +117,23 @@ contract OfferReward is IOfferReward, Ownable {
     function finishOffer(uint48 offerId, uint48 answerId) external {
         require(offerMap[offerId].value > 0, "OfferReward: offer is finished");
         if (answerId == 0) {
-            require(block.timestamp > offerMap[offerId].finishTime, "OfferReward: not over finishTime");
-            uint256 feeAmount = offerMap[offerId].value - offerMap[offerId].answerIdList.length * answerFee;
+            require(block.timestamp >= offerMap[offerId].finishTime, "OfferReward: not over finishTime");
+            uint256 feeAmount = offerMap[offerId].answerIdList.length * answerFee;
             if (feeAmount >= offerMap[offerId].value) {
                 feeAmount = offerMap[offerId].value;
-                offerMap[offerId].value = 0;
-                (bool success, ) = feeAddress.call{value: feeAmount}("");
-                require(success, "OfferReward: send fee failed");
-            } else {
-                uint256 valueAmount = offerMap[offerId].value - feeAmount;
-                offerMap[offerId].value = 0;
-                (bool success, ) = feeAddress.call{value: feeAmount}("");
-                require(success, "OfferReward: send fee failed");
+            }
+            uint256 valueAmount = offerMap[offerId].value - feeAmount;
+            offerMap[offerId].value = 0;
+            (bool success, ) = feeAddress.call{value: feeAmount}("");
+            require(success, "OfferReward: send fee failed");
+            if (valueAmount > 0) {
                 (success, ) = offerMap[offerId].publisher.call{value: valueAmount}("");
                 require(success, "OfferReward: send value failed");
             }
         } else if (answerId > 0) {
             require(offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
             require(answerMap[answerId].offerId == offerId, "OfferReward: not answer");
-            require(offerMap[offerId].publisher != answerMap[answerId].publisher, "OfferReward: you are the publisher");
+            require(offerMap[offerId].publisher != answerMap[answerId].publisher, "OfferReward: you are the answer");
             uint256 feeAmount = (offerMap[offerId].value * feeRate) / 10000;
             uint256 rewardAmount = offerMap[offerId].value - feeAmount;
             publisherMap[offerMap[offerId].publisher].rewardOfferAmount++;
@@ -146,23 +149,26 @@ contract OfferReward is IOfferReward, Ownable {
         emit OfferFinished(offerId);
     }
 
-    function changeOffer(
+    function changeOfferData(
         uint48 offerId,
         string calldata title,
         string calldata content,
-        string[] calldata tagList,
-        uint48 finishTime
-    ) external payable override {
+        string[] calldata tagList
+    ) external override {
+        require(offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
+        offerMap[offerId].offerBlock = uint48(block.number);
+        emit OfferPublished(offerId, offerMap[offerId].publisher, title, content, tagList);
+    }
+
+    function changeOfferValue(uint48 offerId, uint48 finishTime) external payable override {
         require(offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
         require(finishTime >= offerMap[offerId].finishTime, "OfferReward: finishTime can not be less than before");
-        offerMap[offerId].offerBlock = uint48(block.number);
         if (finishTime > offerMap[offerId].finishTime) {
             offerMap[offerId].finishTime = finishTime;
         }
         if (msg.value > 0) {
             offerMap[offerId].value += msg.value;
         }
-        emit OfferPublished(offerId, offerMap[offerId].publisher, title, content, tagList);
     }
 
     function changeAnswer(uint48 answerId, string calldata content) external override {

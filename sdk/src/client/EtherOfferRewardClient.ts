@@ -1,6 +1,7 @@
 import { Provider } from '@ethersproject/providers';
 import {
   BigNumber,
+  utils,
   BytesLike,
   CallOverrides,
   PayableOverrides,
@@ -65,37 +66,37 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     return this._contract.getTagHash(tag, { ...config });
   }
 
-  batchOffer(
+  getOfferList(
     offerIdList: number[],
     config?: CallOverrides
   ): Promise<OfferRewardModel.Offer[]> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
-    return this._contract.batchOffer(offerIdList, { ...config });
+    return this._contract.getOfferList(offerIdList, { ...config });
   }
 
-  batchAnswer(
+  getAnswerList(
     answerIdList: number[],
     config?: CallOverrides
   ): Promise<OfferRewardModel.Answer[]> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
-    return this._contract.batchAnswer(answerIdList, { ...config });
+    return this._contract.getAnswerList(answerIdList, { ...config });
   }
 
-  batchPublisher(
+  getPublisherList(
     publisherAddressList: string[],
     config?: CallOverrides
   ): Promise<OfferRewardModel.Publisher[]> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
-    return this._contract.batchPublisher(publisherAddressList, { ...config });
+    return this._contract.getPublisherList(publisherAddressList, { ...config });
   }
 
-  batchTagOfferId(
+  getOfferIdListByTagHash(
     tagHash: BytesLike,
     start: number,
     length: number,
@@ -104,7 +105,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
-    return this._contract.batchTagOfferId(tagHash, start, length, {
+    return this._contract.getOfferIdListByTagHash(tagHash, start, length, {
       ...config
     });
   }
@@ -248,12 +249,11 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     return messageCreatedEvent;
   }
 
-  async changeOffer(
+  async changeOfferData(
     offerId: number,
     title: string,
     content: string,
     tagList: string[],
-    finishTime: number,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
@@ -266,12 +266,12 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     }
     const gas = await this._contract
       .connect(this._provider)
-      .estimateGas.changeOffer(offerId, title, content, tagList, finishTime, {
+      .estimateGas.changeOfferData(offerId, title, content, tagList, {
         ...config
       });
     const transaction = await this._contract
       .connect(this._provider)
-      .changeOffer(offerId, title, content, tagList, finishTime, {
+      .changeOfferData(offerId, title, content, tagList, {
         gasLimit: gas.mul(13).div(10),
         ...config
       });
@@ -294,6 +294,39 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       throw new Error('no event');
     }
     return messageCreatedEvent;
+  }
+
+  async changeOfferValue(
+    offerId: number,
+    finishTime: number,
+    config?: PayableOverrides,
+    callback?: Function
+  ): Promise<void> {
+    if (
+      !this._provider ||
+      !this._contract ||
+      this._provider instanceof Provider
+    ) {
+      throw new Error(`${this._errorTitle}: no singer`);
+    }
+    const gas = await this._contract
+      .connect(this._provider)
+      .estimateGas.changeOfferValue(offerId, finishTime, {
+        ...config
+      });
+    const transaction = await this._contract
+      .connect(this._provider)
+      .changeOfferValue(offerId, finishTime, {
+        gasLimit: gas.mul(13).div(10),
+        ...config
+      });
+    if (callback) {
+      callback(transaction);
+    }
+    const receipt = await transaction.wait(this._waitConfirmations);
+    if (callback) {
+      callback(receipt);
+    }
   }
 
   async changeAnswer(
@@ -339,5 +372,11 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       throw new Error('no event');
     }
     return messageCreatedEvent;
+  }
+
+  /* ================ UTILS FUNCTIONS ================ */
+
+  tagHash(tag: string): string {
+    return utils.solidityKeccak256(['string'], [tag]);
   }
 }
