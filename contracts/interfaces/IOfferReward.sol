@@ -26,6 +26,14 @@ interface IOfferReward {
         uint48[] answerIdList;
     }
 
+    struct OfferData {
+        uint256 value;
+        uint48 offerBlock;
+        uint48 finishTime;
+        address publisher;
+        uint48 answerIdListLength;
+    }
+
     struct Answer {
         uint48 answerBlock;
         uint48 offerId;
@@ -33,6 +41,20 @@ interface IOfferReward {
     }
 
     struct Publisher {
+        uint48[] offerIdList;
+        uint48[] answerIdList;
+        uint48 publishOfferAmount;
+        uint48 rewardOfferAmount;
+        uint48 publishAnswerAmount;
+        uint48 rewardAnswerAmount;
+        uint256 publishOfferValue;
+        uint256 rewardOfferValue;
+        uint256 rewardAnswerValue;
+    }
+
+    struct PublisherData {
+        uint48 offerIdListLength;
+        uint48 answerIdListLength;
         uint48 publishOfferAmount;
         uint48 rewardOfferAmount;
         uint48 publishAnswerAmount;
@@ -43,17 +65,45 @@ interface IOfferReward {
     }
 
     /* ================ VIEW FUNCTIONS ================ */
+    function getOfferData(uint48 offerId) external view returns (OfferData memory);
+
+    function getAnswerData(uint48 answerId) external view returns (Answer memory);
+
+    function getPublisherData(address publisher) external view returns (PublisherData memory);
+
+    function getOfferIdListLengthByTagHash(bytes32 tagHash) external view returns (uint48);
 
     function getTagHash(string calldata tag) external pure returns (bytes32);
 
-    function getOfferList(uint48[] calldata offerIdList) external view returns (Offer[] memory);
+    function getOfferDataList(uint48[] calldata offerIdList) external view returns (OfferData[] memory);
 
-    function getAnswerList(uint48[] calldata answerIdList) external view returns (Answer[] memory);
+    function getAnswerDataList(uint48[] calldata answerIdList) external view returns (Answer[] memory);
 
-    function getPublisherList(address[] calldata publisherAddressList) external view returns (Publisher[] memory);
+    function getPublisherDataList(address[] calldata publisherAddressList)
+        external
+        view
+        returns (PublisherData[] memory);
 
     function getOfferIdListByTagHash(
         bytes32 tagHash,
+        uint48 start,
+        uint48 length
+    ) external view returns (uint48[] memory);
+
+    function getAnswerIdListByOfferId(
+        uint48 offerId,
+        uint48 start,
+        uint48 length
+    ) external view returns (uint48[] memory);
+
+    function getOfferIdListByPublisher(
+        address publisher,
+        uint48 start,
+        uint48 length
+    ) external view returns (uint48[] memory);
+
+    function getAnswerIdListByPublisher(
+        address publisher,
         uint48 start,
         uint48 length
     ) external view returns (uint48[] memory);
