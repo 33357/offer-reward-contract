@@ -59,6 +59,46 @@ export class EtherOfferRewardClient implements OfferRewardClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
+  getOfferData(
+    offerId: number,
+    config?: CallOverrides
+  ): Promise<OfferRewardModel.OfferData> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getOfferData(offerId, { ...config });
+  }
+
+  getAnswerData(
+    answerId: number,
+    config?: CallOverrides
+  ): Promise<OfferRewardModel.Answer> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getAnswerData(answerId, { ...config });
+  }
+
+  getPublisherData(
+    publisher: string,
+    config?: CallOverrides
+  ): Promise<OfferRewardModel.PublisherData> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getPublisherData(publisher, { ...config });
+  }
+
+  getOfferIdListLengthByTagHash(
+    tagHash: BytesLike,
+    config?: CallOverrides
+  ): Promise<number> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getOfferIdListLengthByTagHash(tagHash, { ...config });
+  }
+
   getTagHash(tag: string, config?: CallOverrides): Promise<BytesLike> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
@@ -66,34 +106,36 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     return this._contract.getTagHash(tag, { ...config });
   }
 
-  getOfferList(
+  getOfferDataList(
     offerIdList: number[],
     config?: CallOverrides
-  ): Promise<OfferRewardModel.Offer[]> {
+  ): Promise<OfferRewardModel.OfferData[]> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
-    return this._contract.getOfferList(offerIdList, { ...config });
+    return this._contract.getOfferDataList(offerIdList, { ...config });
   }
 
-  getAnswerList(
+  getAnswerDataList(
     answerIdList: number[],
     config?: CallOverrides
   ): Promise<OfferRewardModel.Answer[]> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
-    return this._contract.getAnswerList(answerIdList, { ...config });
+    return this._contract.getAnswerDataList(answerIdList, { ...config });
   }
 
-  getPublisherList(
+  getPublisherDataList(
     publisherAddressList: string[],
     config?: CallOverrides
-  ): Promise<OfferRewardModel.Publisher[]> {
+  ): Promise<OfferRewardModel.PublisherData[]> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
-    return this._contract.getPublisherList(publisherAddressList, { ...config });
+    return this._contract.getPublisherDataList(publisherAddressList, {
+      ...config
+    });
   }
 
   getOfferIdListByTagHash(
@@ -106,6 +148,48 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       throw new Error(`${this._errorTitle}: no contract`);
     }
     return this._contract.getOfferIdListByTagHash(tagHash, start, length, {
+      ...config
+    });
+  }
+
+  getAnswerIdListByOfferId(
+    offerId: number,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getAnswerIdListByOfferId(offerId, start, length, {
+      ...config
+    });
+  }
+
+  getOfferIdListByPublisher(
+    publisher: string,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getOfferIdListByPublisher(publisher, start, length, {
+      ...config
+    });
+  }
+
+  getAnswerIdListByPublisher(
+    publisher: string,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getAnswerIdListByPublisher(publisher, start, length, {
       ...config
     });
   }

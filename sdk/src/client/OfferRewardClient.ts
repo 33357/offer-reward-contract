@@ -19,25 +19,66 @@ export interface OfferRewardClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
+  getOfferData(
+    offerId: number,
+    config?: CallOverrides
+  ): Promise<OfferRewardModel.OfferData>;
+
+  getAnswerData(
+    answerId: number,
+    config?: CallOverrides
+  ): Promise<OfferRewardModel.Answer>;
+
+  getPublisherData(
+    publisher: string,
+    config?: CallOverrides
+  ): Promise<OfferRewardModel.PublisherData>;
+
+  getOfferIdListLengthByTagHash(
+    tagHash: BytesLike,
+    config?: CallOverrides
+  ): Promise<number>;
+
   getTagHash(tag: string, config?: CallOverrides): Promise<BytesLike>;
 
-  getOfferList(
+  getOfferDataList(
     offerIdList: number[],
     config?: CallOverrides
-  ): Promise<OfferRewardModel.Offer[]>;
+  ): Promise<OfferRewardModel.OfferData[]>;
 
-  getAnswerList(
+  getAnswerDataList(
     answerIdList: number[],
     config?: CallOverrides
   ): Promise<OfferRewardModel.Answer[]>;
 
-  getPublisherList(
+  getPublisherDataList(
     publisherAddressList: string[],
     config?: CallOverrides
-  ): Promise<OfferRewardModel.Publisher[]>;
+  ): Promise<OfferRewardModel.PublisherData[]>;
 
   getOfferIdListByTagHash(
     tagHash: BytesLike,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]>;
+
+  getAnswerIdListByOfferId(
+    offerId: number,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]>;
+
+  getOfferIdListByPublisher(
+    publisher: string,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]>;
+
+  getAnswerIdListByPublisher(
+    publisher: string,
     start: number,
     length: number,
     config?: CallOverrides
