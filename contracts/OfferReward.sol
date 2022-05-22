@@ -111,7 +111,7 @@ contract OfferReward is IOfferReward, Ownable {
         _publisherMap[msg.sender].publishOfferAmount++;
         _publisherMap[msg.sender].publishOfferValue += msg.value;
         _publisherMap[msg.sender].offerIdList.push(offerLength);
-        emit OfferPublished(offerLength, msg.sender, title, content);
+        emit OfferPublished(offerLength, title, content);
     }
 
     function publishAnswer(uint48 offerId, string calldata content) external override {
@@ -170,7 +170,7 @@ contract OfferReward is IOfferReward, Ownable {
         require(_offerMap[offerId].value > 0, "OfferReward: offer is finished");
         require(_offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
         _offerMap[offerId].offerBlock = uint48(block.number);
-        emit OfferPublished(offerId, _offerMap[offerId].publisher, title, content);
+        emit OfferPublished(offerId, title, content);
     }
 
     function changeOfferValue(uint48 offerId, uint48 finishTime) external payable override {

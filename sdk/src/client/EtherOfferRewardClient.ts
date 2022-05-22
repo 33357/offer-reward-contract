@@ -69,16 +69,6 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     return this._contract.getOfferData(offerId, { ...config });
   }
 
-  getAnswerData(
-    answerId: number,
-    config?: CallOverrides
-  ): Promise<OfferRewardModel.Answer> {
-    if (!this._contract) {
-      throw new Error(`${this._errorTitle}: no contract`);
-    }
-    return this._contract.getAnswerData(answerId, { ...config });
-  }
-
   getPublisherData(
     publisher: string,
     config?: CallOverrides
@@ -87,23 +77,6 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       throw new Error(`${this._errorTitle}: no contract`);
     }
     return this._contract.getPublisherData(publisher, { ...config });
-  }
-
-  getOfferIdListLengthByTagHash(
-    tagHash: BytesLike,
-    config?: CallOverrides
-  ): Promise<number> {
-    if (!this._contract) {
-      throw new Error(`${this._errorTitle}: no contract`);
-    }
-    return this._contract.getOfferIdListLengthByTagHash(tagHash, { ...config });
-  }
-
-  getTagHash(tag: string, config?: CallOverrides): Promise<BytesLike> {
-    if (!this._contract) {
-      throw new Error(`${this._errorTitle}: no contract`);
-    }
-    return this._contract.getTagHash(tag, { ...config });
   }
 
   getOfferDataList(
@@ -116,16 +89,6 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     return this._contract.getOfferDataList(offerIdList, { ...config });
   }
 
-  getAnswerDataList(
-    answerIdList: number[],
-    config?: CallOverrides
-  ): Promise<OfferRewardModel.Answer[]> {
-    if (!this._contract) {
-      throw new Error(`${this._errorTitle}: no contract`);
-    }
-    return this._contract.getAnswerDataList(answerIdList, { ...config });
-  }
-
   getPublisherDataList(
     publisherAddressList: string[],
     config?: CallOverrides
@@ -134,34 +97,6 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       throw new Error(`${this._errorTitle}: no contract`);
     }
     return this._contract.getPublisherDataList(publisherAddressList, {
-      ...config
-    });
-  }
-
-  getOfferIdListByTagHash(
-    tagHash: BytesLike,
-    start: number,
-    length: number,
-    config?: CallOverrides
-  ): Promise<number[]> {
-    if (!this._contract) {
-      throw new Error(`${this._errorTitle}: no contract`);
-    }
-    return this._contract.getOfferIdListByTagHash(tagHash, start, length, {
-      ...config
-    });
-  }
-
-  getAnswerIdListByOfferId(
-    offerId: number,
-    start: number,
-    length: number,
-    config?: CallOverrides
-  ): Promise<number[]> {
-    if (!this._contract) {
-      throw new Error(`${this._errorTitle}: no contract`);
-    }
-    return this._contract.getAnswerIdListByOfferId(offerId, start, length, {
       ...config
     });
   }
@@ -180,26 +115,11 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     });
   }
 
-  getAnswerIdListByPublisher(
-    publisher: string,
-    start: number,
-    length: number,
-    config?: CallOverrides
-  ): Promise<number[]> {
-    if (!this._contract) {
-      throw new Error(`${this._errorTitle}: no contract`);
-    }
-    return this._contract.getAnswerIdListByPublisher(publisher, start, length, {
-      ...config
-    });
-  }
-
   /* ================ TRANSACTION FUNCTIONS ================ */
 
   async publishOffer(
     title: string,
     content: string,
-    tagList: string[],
     finishTime: number,
     config?: PayableOverrides,
     callback?: Function
@@ -213,12 +133,12 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     }
     const gas = await this._contract
       .connect(this._provider)
-      .estimateGas.publishOffer(title, content, tagList, finishTime, {
+      .estimateGas.publishOffer(title, content, finishTime, {
         ...config
       });
     const transaction = await this._contract
       .connect(this._provider)
-      .publishOffer(title, content, tagList, finishTime, {
+      .publishOffer(title, content, finishTime, {
         gasLimit: gas.mul(13).div(10),
         ...config
       });
@@ -290,7 +210,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
 
   async finishOffer(
     offerId: number,
-    answerId: number,
+    rewarder: string,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferFinishedEvent> {
@@ -303,12 +223,12 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     }
     const gas = await this._contract
       .connect(this._provider)
-      .estimateGas.finishOffer(offerId, answerId, {
+      .estimateGas.finishOffer(offerId, rewarder, {
         ...config
       });
     const transaction = await this._contract
       .connect(this._provider)
-      .finishOffer(offerId, answerId, {
+      .finishOffer(offerId, rewarder, {
         gasLimit: gas.mul(13).div(10),
         ...config
       });
@@ -337,7 +257,6 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     offerId: number,
     title: string,
     content: string,
-    tagList: string[],
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
@@ -350,12 +269,12 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     }
     const gas = await this._contract
       .connect(this._provider)
-      .estimateGas.changeOfferData(offerId, title, content, tagList, {
+      .estimateGas.changeOfferData(offerId, title, content, {
         ...config
       });
     const transaction = await this._contract
       .connect(this._provider)
-      .changeOfferData(offerId, title, content, tagList, {
+      .changeOfferData(offerId, title, content, {
         gasLimit: gas.mul(13).div(10),
         ...config
       });
@@ -413,54 +332,55 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     }
   }
 
-  async changeAnswer(
-    answerId: number,
-    content: string,
-    config?: PayableOverrides,
-    callback?: Function
-  ): Promise<OfferRewardModel.AnswerPublishedEvent> {
-    if (
-      !this._provider ||
-      !this._contract ||
-      this._provider instanceof Provider
-    ) {
-      throw new Error(`${this._errorTitle}: no singer`);
+  /* ================ EVENT FUNCTIONS ================ */
+
+  async getOfferPublishedEvent(
+    offerId: number | undefined,
+    from: number,
+    to: number
+  ): Promise<OfferRewardModel.OfferPublishedEvent> {
+    if (!this._provider || !this._contract) {
+      return Promise.reject('need to connect a valid provider');
     }
-    const gas = await this._contract
+    const res = await this._contract
       .connect(this._provider)
-      .estimateGas.changeAnswer(answerId, content, {
-        ...config
-      });
-    const transaction = await this._contract
+      .queryFilter(this._contract.filters.OfferPublished(offerId), from, to);
+    const offerPublishedEvent: OfferRewardModel.OfferPublishedEvent = {
+      hash: res[0].transactionHash,
+      offerId: res[0].args[0],
+      title: res[0].args[1],
+      content: res[0].args[2]
+    };
+    return offerPublishedEvent;
+  }
+
+  async getAnswerPublishedEventList(
+    offerId: number | undefined,
+    publisher: string | undefined,
+    from: number,
+    to: number
+  ): Promise<Array<OfferRewardModel.AnswerPublishedEvent>> {
+    if (!this._provider || !this._contract) {
+      return Promise.reject('need to connect a valid provider');
+    }
+    const res = await this._contract
       .connect(this._provider)
-      .changeAnswer(answerId, content, {
-        gasLimit: gas.mul(13).div(10),
-        ...config
+      .queryFilter(
+        this._contract.filters.AnswerPublished(offerId, publisher),
+        from,
+        to
+      );
+    const events: Array<OfferRewardModel.AnswerPublishedEvent> = [];
+    res.forEach(messageCreatedEventList => {
+      events.push({
+        hash: messageCreatedEventList.transactionHash,
+        offerId: messageCreatedEventList.args[0],
+        publisher: messageCreatedEventList.args[1],
+        content: messageCreatedEventList.args[2]
       });
-    if (callback) {
-      callback(transaction);
-    }
-    const receipt = await transaction.wait(this._waitConfirmations);
-    if (callback) {
-      callback(receipt);
-    }
-    let messageCreatedEvent: OfferRewardModel.AnswerPublishedEvent | undefined;
-    if (receipt.events) {
-      receipt.events
-        .filter(event => event.event === 'AnswerPublished' && event.args)
-        .map(event => {
-          messageCreatedEvent = event.args as any;
-        });
-    }
-    if (!messageCreatedEvent) {
-      throw new Error('no event');
-    }
-    return messageCreatedEvent;
+    });
+    return events;
   }
 
   /* ================ UTILS FUNCTIONS ================ */
-
-  tagHash(tag: string): string {
-    return utils.solidityKeccak256(['string'], [tag]);
-  }
 }

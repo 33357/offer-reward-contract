@@ -1,15 +1,14 @@
 import { BigNumber } from 'ethers';
 
 export interface OfferPublishedEvent {
+  hash: string;
   offerId: number;
-  publisher: string;
   title: string;
   content: string;
-  tagList: string[];
 }
 
 export interface AnswerPublishedEvent {
-  answerId: number;
+  hash: string;
   offerId: number;
   publisher: string;
   content: string;
@@ -25,6 +24,7 @@ export interface Offer {
   finishTime: number;
   publisher: string;
   answerIdList: number[];
+  answerAmount: number;
 }
 
 export interface OfferData {
@@ -32,18 +32,12 @@ export interface OfferData {
   offerBlock: number;
   finishTime: number;
   publisher: string;
-  answerIdListLength: number;
-}
-
-export interface Answer {
-  answerBlock: number;
-  offerId: number;
-  publisher: string;
+  answerBlockListLength: number;
+  answerAmount: number;
 }
 
 export interface Publisher {
   offerIdList: number[];
-  answerIdList: number[];
   publishOfferAmount: number;
   rewardOfferAmount: number;
   publishAnswerAmount: number;
@@ -55,7 +49,6 @@ export interface Publisher {
 
 export interface PublisherData {
   offerIdListLength: number;
-  answerIdListLength: number;
   publishOfferAmount: number;
   rewardOfferAmount: number;
   publishAnswerAmount: number;

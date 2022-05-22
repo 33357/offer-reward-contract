@@ -4,12 +4,7 @@ pragma solidity ^0.8.12;
 interface IOfferReward {
     /* ================ EVENTS ================ */
 
-    event OfferPublished(
-        uint48 indexed offerId,
-        address indexed publisher,
-        string title,
-        string content
-    );
+    event OfferPublished(uint48 indexed offerId, string title, string content);
 
     event AnswerPublished(uint48 indexed offerId, address indexed publisher, string content);
 
