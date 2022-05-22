@@ -8,11 +8,10 @@ interface IOfferReward {
         uint48 indexed offerId,
         address indexed publisher,
         string title,
-        string content,
-        string[] tagList
+        string content
     );
 
-    event AnswerPublished(uint48 indexed answerId, uint48 indexed offerId, address indexed publisher, string content);
+    event AnswerPublished(uint48 indexed offerId, address indexed publisher, string content);
 
     event OfferFinished(uint48 indexed offerId);
 
@@ -23,7 +22,8 @@ interface IOfferReward {
         uint48 offerBlock;
         uint48 finishTime;
         address publisher;
-        uint48[] answerIdList;
+        uint48 answerAmount;
+        uint48[] answerBlockList;
     }
 
     struct OfferData {
@@ -31,18 +31,12 @@ interface IOfferReward {
         uint48 offerBlock;
         uint48 finishTime;
         address publisher;
-        uint48 answerIdListLength;
-    }
-
-    struct Answer {
-        uint48 answerBlock;
-        uint48 offerId;
-        address publisher;
+        uint48 answerAmount;
+        uint48 answerBlockListLength;
     }
 
     struct Publisher {
         uint48[] offerIdList;
-        uint48[] answerIdList;
         uint48 publishOfferAmount;
         uint48 rewardOfferAmount;
         uint48 publishAnswerAmount;
@@ -54,7 +48,6 @@ interface IOfferReward {
 
     struct PublisherData {
         uint48 offerIdListLength;
-        uint48 answerIdListLength;
         uint48 publishOfferAmount;
         uint48 rewardOfferAmount;
         uint48 publishAnswerAmount;
@@ -67,42 +60,16 @@ interface IOfferReward {
     /* ================ VIEW FUNCTIONS ================ */
     function getOfferData(uint48 offerId) external view returns (OfferData memory);
 
-    function getAnswerData(uint48 answerId) external view returns (Answer memory);
-
     function getPublisherData(address publisher) external view returns (PublisherData memory);
 
-    function getOfferIdListLengthByTagHash(bytes32 tagHash) external view returns (uint48);
-
-    function getTagHash(string calldata tag) external pure returns (bytes32);
-
     function getOfferDataList(uint48[] calldata offerIdList) external view returns (OfferData[] memory);
-
-    function getAnswerDataList(uint48[] calldata answerIdList) external view returns (Answer[] memory);
 
     function getPublisherDataList(address[] calldata publisherAddressList)
         external
         view
         returns (PublisherData[] memory);
 
-    function getOfferIdListByTagHash(
-        bytes32 tagHash,
-        uint48 start,
-        uint48 length
-    ) external view returns (uint48[] memory);
-
-    function getAnswerIdListByOfferId(
-        uint48 offerId,
-        uint48 start,
-        uint48 length
-    ) external view returns (uint48[] memory);
-
     function getOfferIdListByPublisher(
-        address publisher,
-        uint48 start,
-        uint48 length
-    ) external view returns (uint48[] memory);
-
-    function getAnswerIdListByPublisher(
         address publisher,
         uint48 start,
         uint48 length
@@ -113,24 +80,20 @@ interface IOfferReward {
     function publishOffer(
         string calldata title,
         string calldata content,
-        string[] calldata tagList,
         uint48 finishTime
     ) external payable;
 
     function publishAnswer(uint48 offerId, string calldata content) external;
 
-    function finishOffer(uint48 offerId, uint48 answerId) external;
+    function finishOffer(uint48 offerId, address rewarder) external;
 
     function changeOfferData(
         uint48 offerId,
         string calldata title,
-        string calldata content,
-        string[] calldata tagList
+        string calldata content
     ) external;
 
     function changeOfferValue(uint48 offerId, uint48 finishTime) external payable;
-
-    function changeAnswer(uint48 answerId, string calldata content) external;
 
     /* ================ ADMIN FUNCTIONS ================ */
 
@@ -143,4 +106,6 @@ interface IOfferReward {
     function setAnswerFee(uint256 newAnswerFee) external;
 
     function setMinFinshTime(uint48 newMinFinshTime) external;
+
+    function setBlockSkip(uint48 newBlockSkip) external;
 }
