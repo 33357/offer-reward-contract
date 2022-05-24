@@ -28,21 +28,16 @@ export class EtherOfferRewardClient implements OfferRewardClient {
   ) {
     this._errorTitle = 'EtherOfferRewardClient';
     if (!address) {
-      let network;
+      let chainId;
       if (provider instanceof Signer) {
-        if (provider.provider) {
-          network = await provider.provider.getNetwork();
-        }
+        chainId = await provider.getChainId();
       } else {
-        network = await provider.getNetwork();
+        chainId = (await provider.getNetwork()).chainId;
       }
-      if (!network) {
-        throw new Error(`${this._errorTitle}: no provider`);
-      }
-      if (!DeploymentInfo[network.chainId]) {
+      if (!DeploymentInfo[chainId]) {
         throw new Error(`${this._errorTitle}: error chain`);
       }
-      address = DeploymentInfo[network.chainId].OfferReward.proxyAddress;
+      address = DeploymentInfo[chainId].OfferReward.proxyAddress;
     }
     this._contract = OfferReward__factory.connect(address, provider);
     if (waitConfirmations) {
@@ -51,8 +46,8 @@ export class EtherOfferRewardClient implements OfferRewardClient {
   }
 
   public address(): string {
-    if (!this._provider || !this._contract) {
-      throw new Error(`${this._errorTitle}: no provider`);
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
     }
     return this._contract.address;
   }
