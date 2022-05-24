@@ -17,7 +17,7 @@ import {
 
 export class EtherOfferRewardClient implements OfferRewardClient {
   protected _provider: Provider | Signer | undefined;
-  protected _waitConfirmations = 3;
+  protected _waitConfirmations = 1;
   private _contract: OfferReward | undefined;
   private _errorTitle: string | undefined;
 

@@ -23,7 +23,7 @@ export interface Offer {
   offerBlock: number;
   finishTime: number;
   publisher: string;
-  answerIdList: number[];
+  answerBlockList: number[];
   answerAmount: number;
 }
 
