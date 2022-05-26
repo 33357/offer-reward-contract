@@ -9,7 +9,7 @@ contract OfferReward is IOfferReward, Ownable {
 
     mapping(address => Publisher) private _publisherMap;
 
-    uint48 public offerLength = 0;
+    uint48 public offerLength;
 
     uint48 public minFinshTime = 1 days;
 
@@ -99,7 +99,6 @@ contract OfferReward is IOfferReward, Ownable {
     ) external payable override {
         require(finishTime - block.timestamp >= minFinshTime, "OfferReward: finishTime is too short");
         require(msg.value >= minOfferValue, "OfferReward: value is too low");
-        offerLength++;
         _offerMap[offerLength] = Offer({
             value: msg.value,
             offerBlock: uint48(block.number),
@@ -112,10 +111,11 @@ contract OfferReward is IOfferReward, Ownable {
         _publisherMap[msg.sender].publishOfferValue += msg.value;
         _publisherMap[msg.sender].offerIdList.push(offerLength);
         emit OfferPublished(offerLength, title, content);
+        offerLength++;
     }
 
     function publishAnswer(uint48 offerId, string calldata content) external override {
-        require(offerId <= offerLength, "OfferReward: offer is not exit");
+        require(offerId < offerLength, "OfferReward: offer is not exit");
         if (
             _offerMap[offerId].answerBlockList.length == 0 ||
             uint48(block.number) - _offerMap[offerId].answerBlockList[_offerMap[offerId].answerBlockList.length - 1] >
