@@ -40,6 +40,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       address = DeploymentInfo[chainId].OfferReward.proxyAddress;
     }
     this._contract = OfferReward__factory.connect(address, provider);
+    this._provider = provider;
     if (waitConfirmations) {
       this._waitConfirmations = waitConfirmations;
     }
@@ -127,19 +128,16 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     callback?: Function
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
     if (
-      !this._provider ||
       !this._contract ||
       this._provider instanceof Provider
     ) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
     const gas = await this._contract
-      .connect(this._provider)
       .estimateGas.publishOffer(title, content, finishTime, {
         ...config
       });
     const transaction = await this._contract
-      .connect(this._provider)
       .publishOffer(title, content, finishTime, {
         gasLimit: gas.mul(13).div(10),
         ...config
@@ -172,19 +170,16 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     callback?: Function
   ): Promise<OfferRewardModel.AnswerPublishedEvent> {
     if (
-      !this._provider ||
       !this._contract ||
       this._provider instanceof Provider
     ) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
     const gas = await this._contract
-      .connect(this._provider)
       .estimateGas.publishAnswer(offerId, content, {
         ...config
       });
     const transaction = await this._contract
-      .connect(this._provider)
       .publishAnswer(offerId, content, {
         gasLimit: gas.mul(13).div(10),
         ...config
@@ -217,19 +212,16 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     callback?: Function
   ): Promise<OfferRewardModel.OfferFinishedEvent> {
     if (
-      !this._provider ||
       !this._contract ||
       this._provider instanceof Provider
     ) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
     const gas = await this._contract
-      .connect(this._provider)
       .estimateGas.finishOffer(offerId, rewarder, {
         ...config
       });
     const transaction = await this._contract
-      .connect(this._provider)
       .finishOffer(offerId, rewarder, {
         gasLimit: gas.mul(13).div(10),
         ...config
@@ -263,19 +255,16 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     callback?: Function
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
     if (
-      !this._provider ||
       !this._contract ||
       this._provider instanceof Provider
     ) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
     const gas = await this._contract
-      .connect(this._provider)
       .estimateGas.changeOfferData(offerId, title, content, {
         ...config
       });
     const transaction = await this._contract
-      .connect(this._provider)
       .changeOfferData(offerId, title, content, {
         gasLimit: gas.mul(13).div(10),
         ...config
@@ -308,19 +297,16 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     callback?: Function
   ): Promise<void> {
     if (
-      !this._provider ||
       !this._contract ||
       this._provider instanceof Provider
     ) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
     const gas = await this._contract
-      .connect(this._provider)
       .estimateGas.changeOfferValue(offerId, finishTime, {
         ...config
       });
     const transaction = await this._contract
-      .connect(this._provider)
       .changeOfferValue(offerId, finishTime, {
         gasLimit: gas.mul(13).div(10),
         ...config
@@ -341,11 +327,10 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     from: number,
     to: number
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
-    if (!this._provider || !this._contract) {
+    if (!this._contract) {
       return Promise.reject('need to connect a valid provider');
     }
     const res = await this._contract
-      .connect(this._provider)
       .queryFilter(this._contract.filters.OfferPublished(offerId), from, to);
     const offerPublishedEvent: OfferRewardModel.OfferPublishedEvent = {
       hash: res[0].transactionHash,
@@ -362,11 +347,10 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     from: number,
     to: number
   ): Promise<Array<OfferRewardModel.AnswerPublishedEvent>> {
-    if (!this._provider || !this._contract) {
+    if (!this._contract) {
       return Promise.reject('need to connect a valid provider');
     }
     const res = await this._contract
-      .connect(this._provider)
       .queryFilter(
         this._contract.filters.AnswerPublished(offerId, publisher),
         from,
