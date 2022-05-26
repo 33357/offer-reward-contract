@@ -54,6 +54,13 @@ export class EtherOfferRewardClient implements OfferRewardClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
+  getOfferLength(config?: CallOverrides): Promise<number> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.offerLength({ ...config });
+  }
+
   getOfferData(
     offerId: number,
     config?: CallOverrides
