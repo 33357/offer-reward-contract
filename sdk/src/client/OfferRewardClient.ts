@@ -41,6 +41,13 @@ export interface OfferRewardClient {
     config?: CallOverrides
   ): Promise<OfferRewardModel.PublisherData[]>;
 
+  getAnswerBlockListByOffer(
+    offerId: number,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]>;
+
   getOfferIdListByPublisher(
     publisher: string,
     start: number,

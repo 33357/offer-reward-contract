@@ -78,6 +78,18 @@ contract OfferReward is IOfferReward, Ownable {
         return publisherDataList;
     }
 
+    function getAnswerBlockListByOffer(
+        uint48 offerId,
+        uint48 start,
+        uint48 length
+    ) public view override returns (uint48[] memory) {
+        uint48[] memory answerBlockList = new uint48[](length);
+        for (uint48 i = 0; i < length; i++) {
+            answerBlockList[i] = _offerMap[offerId].answerBlockList[start + i];
+        }
+        return answerBlockList;
+    }
+
     function getOfferIdListByPublisher(
         address publisher,
         uint48 start,

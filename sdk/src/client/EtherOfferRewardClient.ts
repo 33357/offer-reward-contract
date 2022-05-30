@@ -104,6 +104,20 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     });
   }
 
+  getAnswerBlockListByOffer(
+    offerId: number,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getAnswerBlockListByOffer(offerId, start, length, {
+      ...config
+    });
+  }
+
   getOfferIdListByPublisher(
     publisher: string,
     start: number,
@@ -127,21 +141,26 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
-    if (
-      !this._contract ||
-      this._provider instanceof Provider
-    ) {
+    if (!this._contract || this._provider instanceof Provider) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
-    const gas = await this._contract
-      .estimateGas.publishOffer(title, content, finishTime, {
+    const gas = await this._contract.estimateGas.publishOffer(
+      title,
+      content,
+      finishTime,
+      {
         ...config
-      });
-    const transaction = await this._contract
-      .publishOffer(title, content, finishTime, {
+      }
+    );
+    const transaction = await this._contract.publishOffer(
+      title,
+      content,
+      finishTime,
+      {
         gasLimit: gas.mul(13).div(10),
         ...config
-      });
+      }
+    );
     if (callback) {
       callback(transaction);
     }
@@ -169,21 +188,20 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.AnswerPublishedEvent> {
-    if (
-      !this._contract ||
-      this._provider instanceof Provider
-    ) {
+    if (!this._contract || this._provider instanceof Provider) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
-    const gas = await this._contract
-      .estimateGas.publishAnswer(offerId, content, {
+    const gas = await this._contract.estimateGas.publishAnswer(
+      offerId,
+      content,
+      {
         ...config
-      });
-    const transaction = await this._contract
-      .publishAnswer(offerId, content, {
-        gasLimit: gas.mul(13).div(10),
-        ...config
-      });
+      }
+    );
+    const transaction = await this._contract.publishAnswer(offerId, content, {
+      gasLimit: gas.mul(13).div(10),
+      ...config
+    });
     if (callback) {
       callback(transaction);
     }
@@ -211,21 +229,20 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferFinishedEvent> {
-    if (
-      !this._contract ||
-      this._provider instanceof Provider
-    ) {
+    if (!this._contract || this._provider instanceof Provider) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
-    const gas = await this._contract
-      .estimateGas.finishOffer(offerId, rewarder, {
+    const gas = await this._contract.estimateGas.finishOffer(
+      offerId,
+      rewarder,
+      {
         ...config
-      });
-    const transaction = await this._contract
-      .finishOffer(offerId, rewarder, {
-        gasLimit: gas.mul(13).div(10),
-        ...config
-      });
+      }
+    );
+    const transaction = await this._contract.finishOffer(offerId, rewarder, {
+      gasLimit: gas.mul(13).div(10),
+      ...config
+    });
     if (callback) {
       callback(transaction);
     }
@@ -254,21 +271,26 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
-    if (
-      !this._contract ||
-      this._provider instanceof Provider
-    ) {
+    if (!this._contract || this._provider instanceof Provider) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
-    const gas = await this._contract
-      .estimateGas.changeOfferData(offerId, title, content, {
+    const gas = await this._contract.estimateGas.changeOfferData(
+      offerId,
+      title,
+      content,
+      {
         ...config
-      });
-    const transaction = await this._contract
-      .changeOfferData(offerId, title, content, {
+      }
+    );
+    const transaction = await this._contract.changeOfferData(
+      offerId,
+      title,
+      content,
+      {
         gasLimit: gas.mul(13).div(10),
         ...config
-      });
+      }
+    );
     if (callback) {
       callback(transaction);
     }
@@ -296,21 +318,24 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     config?: PayableOverrides,
     callback?: Function
   ): Promise<void> {
-    if (
-      !this._contract ||
-      this._provider instanceof Provider
-    ) {
+    if (!this._contract || this._provider instanceof Provider) {
       throw new Error(`${this._errorTitle}: no singer`);
     }
-    const gas = await this._contract
-      .estimateGas.changeOfferValue(offerId, finishTime, {
+    const gas = await this._contract.estimateGas.changeOfferValue(
+      offerId,
+      finishTime,
+      {
         ...config
-      });
-    const transaction = await this._contract
-      .changeOfferValue(offerId, finishTime, {
+      }
+    );
+    const transaction = await this._contract.changeOfferValue(
+      offerId,
+      finishTime,
+      {
         gasLimit: gas.mul(13).div(10),
         ...config
-      });
+      }
+    );
     if (callback) {
       callback(transaction);
     }
@@ -330,8 +355,11 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     if (!this._contract) {
       return Promise.reject('need to connect a valid provider');
     }
-    const res = await this._contract
-      .queryFilter(this._contract.filters.OfferPublished(offerId), from, to);
+    const res = await this._contract.queryFilter(
+      this._contract.filters.OfferPublished(offerId),
+      from,
+      to
+    );
     const offerPublishedEvent: OfferRewardModel.OfferPublishedEvent = {
       hash: res[0].transactionHash,
       offerId: res[0].args[0],
@@ -350,12 +378,11 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     if (!this._contract) {
       return Promise.reject('need to connect a valid provider');
     }
-    const res = await this._contract
-      .queryFilter(
-        this._contract.filters.AnswerPublished(offerId, publisher),
-        from,
-        to
-      );
+    const res = await this._contract.queryFilter(
+      this._contract.filters.AnswerPublished(offerId, publisher),
+      from,
+      to
+    );
     const events: Array<OfferRewardModel.AnswerPublishedEvent> = [];
     res.forEach(messageCreatedEventList => {
       events.push({

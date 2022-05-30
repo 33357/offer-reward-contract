@@ -64,6 +64,12 @@ interface IOfferReward {
         view
         returns (PublisherData[] memory);
 
+    function getAnswerBlockListByOffer(
+        uint48 offerId,
+        uint48 start,
+        uint48 length
+    ) external view returns (uint48[] memory);
+
     function getOfferIdListByPublisher(
         address publisher,
         uint48 start,
