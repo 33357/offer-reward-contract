@@ -19,6 +19,8 @@ export interface OfferRewardClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
+  getBlockSkip(config?: CallOverrides): Promise<number>;
+
   getOfferLength(config?: CallOverrides): Promise<number>;
 
   getOfferData(
