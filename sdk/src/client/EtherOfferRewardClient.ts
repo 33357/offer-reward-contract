@@ -1,8 +1,6 @@
 import { Provider } from '@ethersproject/providers';
 import {
   BigNumber,
-  utils,
-  BytesLike,
   CallOverrides,
   PayableOverrides,
   Signer
@@ -386,7 +384,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       return Promise.reject('need to connect a valid provider');
     }
     const res = await this._contract.queryFilter(
-      this._contract.filters.AnswerPublished(offerId, publisher),
+      this._contract.filters.AnswerPublished(offerId?BigNumber.from(offerId):undefined, publisher),
       from,
       to
     );
