@@ -117,6 +117,7 @@ contract OfferReward is IOfferReward, Ownable {
             finishTime: finishTime,
             publisher: msg.sender,
             answerAmount: 0,
+            rewarder:address(0),
             answerBlockList: new uint48[](0)
         });
         _publisherMap[msg.sender].publishOfferAmount++;
@@ -166,6 +167,7 @@ contract OfferReward is IOfferReward, Ownable {
             _publisherMap[rewarder].rewardAnswerAmount++;
             _publisherMap[rewarder].rewardAnswerValue += _offerMap[offerId].value;
             _offerMap[offerId].value = 0;
+            _offerMap[offerId].rewarder = rewarder;
             (bool success, ) = feeAddress.call{value: feeAmount}("");
             require(success, "OfferReward: send fee failed");
             (success, ) = rewarder.call{value: rewardAmount}("");

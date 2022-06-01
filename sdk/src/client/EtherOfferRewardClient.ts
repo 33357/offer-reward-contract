@@ -1,10 +1,5 @@
 import { Provider } from '@ethersproject/providers';
-import {
-  BigNumber,
-  CallOverrides,
-  PayableOverrides,
-  Signer
-} from 'ethers';
+import { BigNumber, CallOverrides, PayableOverrides, Signer } from 'ethers';
 import { OfferRewardModel } from 'src/model';
 import {
   OfferRewardClient,
@@ -53,7 +48,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
-  getBlockSkip(config?: CallOverrides): Promise<number>  {
+  getBlockSkip(config?: CallOverrides): Promise<number> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
@@ -384,7 +379,10 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       return Promise.reject('need to connect a valid provider');
     }
     const res = await this._contract.queryFilter(
-      this._contract.filters.AnswerPublished(offerId?BigNumber.from(offerId):undefined, publisher),
+      this._contract.filters.AnswerPublished(
+        offerId ? BigNumber.from(offerId) : undefined,
+        publisher
+      ),
       from,
       to
     );

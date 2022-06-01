@@ -23,9 +23,11 @@ export interface Offer {
   offerBlock: number;
   finishTime: number;
   publisher: string;
-  answerBlockList: number[];
   answerAmount: number;
+  rewarder: string;
+  answerBlockList: number[];
 }
+ 
 
 export interface OfferData {
   value: BigNumber;

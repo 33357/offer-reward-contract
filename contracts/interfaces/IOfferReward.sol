@@ -18,6 +18,7 @@ interface IOfferReward {
         uint48 finishTime;
         address publisher;
         uint48 answerAmount;
+        address rewarder;
         uint48[] answerBlockList;
     }
 
