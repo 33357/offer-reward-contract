@@ -15,7 +15,10 @@ export interface AnswerPublishedEvent {
 }
 
 export interface OfferFinishedEvent {
+  hash: string;
   offerId: number;
+  rewarder: string;
+  value: BigNumber;
 }
 
 export interface Offer {
@@ -27,7 +30,7 @@ export interface Offer {
   finishBlock: number;
   answerBlockList: number[];
 }
- 
+
 
 export interface OfferData {
   value: BigNumber;

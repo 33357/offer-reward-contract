@@ -108,6 +108,13 @@ export interface OfferRewardClient {
     to: number
   ): Promise<OfferRewardModel.OfferPublishedEvent>;
 
+  getOfferFinishedEvent(
+    offerId: number | undefined,
+    rewarder: string | undefined,
+    from: number,
+    to: number
+  ): Promise<OfferRewardModel.OfferFinishedEvent>;
+
   getAnswerPublishedEventList(
     offerId: number | undefined,
     publisher: string | undefined,

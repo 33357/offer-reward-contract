@@ -411,6 +411,29 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     return offerPublishedEvent;
   }
 
+  async getOfferFinishedEvent(
+    offerId: number | undefined,
+    rewarder: string | undefined,
+    from: number,
+    to: number
+  ): Promise<OfferRewardModel.OfferFinishedEvent>{
+    if (!this._contract) {
+      return Promise.reject('need to connect a valid provider');
+    }
+    const res = await this._contract.queryFilter(
+      this._contract.filters.OfferFinished(offerId,rewarder),
+      from,
+      to
+    );
+    const offerFinishedEvent: OfferRewardModel.OfferFinishedEvent = {
+      hash: res[0].transactionHash,
+      offerId: res[0].args[0],
+      rewarder: res[0].args[1],
+      value: res[0].args[2]
+    };
+    return offerFinishedEvent;
+  }
+
   async getAnswerPublishedEventList(
     offerId: number | undefined,
     publisher: string | undefined,
