@@ -19,6 +19,18 @@ export interface OfferRewardClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
+  getWaitTime(config?: CallOverrides): Promise<number>;
+
+  getMinFinshTime(config?: CallOverrides): Promise<number>;
+  
+  getFeeRate(config?: CallOverrides): Promise<number>;
+
+  getFeeAddress(config?: CallOverrides): Promise<string>;
+
+  getMinOfferValue(config?: CallOverrides): Promise<BigNumber>;
+
+  getAnswerFee(config?: CallOverrides): Promise<BigNumber>;
+
   getBlockSkip(config?: CallOverrides): Promise<number>;
 
   getOfferLength(config?: CallOverrides): Promise<number>;

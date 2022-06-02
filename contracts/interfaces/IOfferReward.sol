@@ -8,7 +8,7 @@ interface IOfferReward {
 
     event AnswerPublished(uint48 indexed offerId, address indexed publisher, string content);
 
-    event OfferFinished(uint48 indexed offerId);
+    event OfferFinished(uint48 indexed offerId, address indexed rewarder, uint256 value);
 
     /* ================ STRUCTS ================ */
 
@@ -18,7 +18,7 @@ interface IOfferReward {
         uint48 finishTime;
         address publisher;
         uint48 answerAmount;
-        address rewarder;
+        uint48 finishBlock;
         uint48[] answerBlockList;
     }
 
@@ -28,6 +28,7 @@ interface IOfferReward {
         uint48 finishTime;
         address publisher;
         uint48 answerAmount;
+        uint48 finishBlock;
         uint48 answerBlockListLength;
     }
 
@@ -96,18 +97,4 @@ interface IOfferReward {
     ) external;
 
     function changeOfferValue(uint48 offerId, uint48 finishTime) external payable;
-
-    /* ================ ADMIN FUNCTIONS ================ */
-
-    function setFeeRate(uint48 newFeeRate) external;
-
-    function setFeeAddress(address newFeeAddress) external;
-
-    function setMinOfferValue(uint256 newMinOfferValue) external;
-
-    function setAnswerFee(uint256 newAnswerFee) external;
-
-    function setMinFinshTime(uint48 newMinFinshTime) external;
-
-    function setBlockSkip(uint48 newBlockSkip) external;
 }

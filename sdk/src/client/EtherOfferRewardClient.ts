@@ -48,6 +48,48 @@ export class EtherOfferRewardClient implements OfferRewardClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
+  getWaitTime(config?: CallOverrides): Promise<number> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.waitTime({ ...config });
+  }
+
+  getMinFinshTime(config?: CallOverrides): Promise<number>{
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.minFinshTime({ ...config });
+  }
+  
+  getFeeRate(config?: CallOverrides): Promise<number>{
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.feeRate({ ...config });
+  }
+
+  getFeeAddress(config?: CallOverrides): Promise<string>{
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.feeAddress({ ...config });
+  }
+
+  getMinOfferValue(config?: CallOverrides): Promise<BigNumber>{
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.minOfferValue({ ...config });
+  }
+
+  getAnswerFee(config?: CallOverrides): Promise<BigNumber>{
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.answerFee({ ...config });
+  }
+
   getBlockSkip(config?: CallOverrides): Promise<number> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);

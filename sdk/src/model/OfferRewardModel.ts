@@ -24,7 +24,7 @@ export interface Offer {
   finishTime: number;
   publisher: string;
   answerAmount: number;
-  rewarder: string;
+  finishBlock: number;
   answerBlockList: number[];
 }
  
@@ -34,6 +34,7 @@ export interface OfferData {
   offerBlock: number;
   finishTime: number;
   publisher: string;
+  finishBlock: number;
   answerBlockListLength: number;
   answerAmount: number;
 }

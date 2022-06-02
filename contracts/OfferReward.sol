@@ -11,7 +11,9 @@ contract OfferReward is IOfferReward, Ownable {
 
     uint48 public offerLength;
 
-    uint48 public minFinshTime = 1 days;
+    uint48 public minFinshTime = 1 hours;
+
+    uint48 public waitTime = 7 days;
 
     uint48 public blockSkip = 5000;
 
@@ -19,9 +21,9 @@ contract OfferReward is IOfferReward, Ownable {
 
     address public feeAddress;
 
-    uint256 public minOfferValue = 0.003 ether;
+    uint256 public minOfferValue = 0.005 ether;
 
-    uint256 public answerFee = 0.0002 ether;
+    uint256 public answerFee = 0.00025 ether;
 
     constructor() {
         feeAddress = msg.sender;
@@ -38,6 +40,7 @@ contract OfferReward is IOfferReward, Ownable {
             finishTime: _offerMap[offerId].finishTime,
             publisher: _offerMap[offerId].publisher,
             answerAmount: _offerMap[offerId].answerAmount,
+            finishBlock: _offerMap[offerId].finishBlock,
             answerBlockListLength: uint48(_offerMap[offerId].answerBlockList.length)
         });
         return offerData;
@@ -117,7 +120,7 @@ contract OfferReward is IOfferReward, Ownable {
             finishTime: finishTime,
             publisher: msg.sender,
             answerAmount: 0,
-            rewarder:address(0),
+            finishBlock: 0,
             answerBlockList: new uint48[](0)
         });
         _publisherMap[msg.sender].publishOfferAmount++;
@@ -143,8 +146,12 @@ contract OfferReward is IOfferReward, Ownable {
 
     function finishOffer(uint48 offerId, address rewarder) external {
         require(_offerMap[offerId].value > 0, "OfferReward: offer is finished");
+        emit OfferFinished(offerId, rewarder, _offerMap[offerId].value);
         if (rewarder == address(0)) {
-            require(block.timestamp >= _offerMap[offerId].finishTime, "OfferReward: not over finishTime");
+            require(
+                block.timestamp >= _offerMap[offerId].finishTime + waitTime,
+                "OfferReward: not over finishTime + waitTime"
+            );
             uint256 feeAmount = _offerMap[offerId].answerAmount * answerFee;
             if (feeAmount >= _offerMap[offerId].value) {
                 feeAmount = _offerMap[offerId].value;
@@ -167,13 +174,12 @@ contract OfferReward is IOfferReward, Ownable {
             _publisherMap[rewarder].rewardAnswerAmount++;
             _publisherMap[rewarder].rewardAnswerValue += _offerMap[offerId].value;
             _offerMap[offerId].value = 0;
-            _offerMap[offerId].rewarder = rewarder;
+            _offerMap[offerId].finishBlock = uint48(block.number);
             (bool success, ) = feeAddress.call{value: feeAmount}("");
             require(success, "OfferReward: send fee failed");
             (success, ) = rewarder.call{value: rewardAmount}("");
             require(success, "OfferReward: send reward failed");
         }
-        emit OfferFinished(offerId);
     }
 
     function changeOfferData(
@@ -201,27 +207,31 @@ contract OfferReward is IOfferReward, Ownable {
 
     /* ================ ADMIN FUNCTIONS ================ */
 
-    function setFeeRate(uint48 newFeeRate) external override onlyOwner {
+    function setFeeRate(uint48 newFeeRate) external onlyOwner {
         feeRate = newFeeRate;
     }
 
-    function setFeeAddress(address newFeeAddress) external override onlyOwner {
+    function setFeeAddress(address newFeeAddress) external onlyOwner {
         feeAddress = newFeeAddress;
     }
 
-    function setMinOfferValue(uint256 newMinOfferValue) external override onlyOwner {
+    function setMinOfferValue(uint256 newMinOfferValue) external onlyOwner {
         minOfferValue = newMinOfferValue;
     }
 
-    function setAnswerFee(uint256 newAnswerFee) external override onlyOwner {
+    function setAnswerFee(uint256 newAnswerFee) external onlyOwner {
         answerFee = newAnswerFee;
     }
 
-    function setMinFinshTime(uint48 newMinFinshTime) external override onlyOwner {
+    function setMinFinshTime(uint48 newMinFinshTime) external onlyOwner {
         minFinshTime = newMinFinshTime;
     }
 
-    function setBlockSkip(uint48 newBlockSkip) external override onlyOwner {
+    function setBlockSkip(uint48 newBlockSkip) external onlyOwner {
         blockSkip = newBlockSkip;
+    }
+
+    function setWaitTime(uint48 newWaitTime) external onlyOwner {
+        waitTime = newWaitTime;
     }
 }
