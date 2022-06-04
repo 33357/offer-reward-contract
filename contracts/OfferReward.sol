@@ -110,14 +110,14 @@ contract OfferReward is IOfferReward, Ownable {
     function publishOffer(
         string calldata title,
         string calldata content,
-        uint48 finishTime
+        uint48 offerTime
     ) external payable override {
-        require(finishTime - block.timestamp >= minFinshTime, "OfferReward: finishTime is too short");
+        require(offerTime >= minFinshTime, "OfferReward: offerTime is too short");
         require(msg.value >= minOfferValue, "OfferReward: value is too low");
         _offerMap[offerLength] = Offer({
             value: msg.value,
             offerBlock: uint48(block.number),
-            finishTime: finishTime,
+            finishTime: uint48(block.timestamp + offerTime),
             publisher: msg.sender,
             answerAmount: 0,
             finishBlock: 0,
@@ -193,12 +193,13 @@ contract OfferReward is IOfferReward, Ownable {
         emit OfferPublished(offerId, title, content);
     }
 
-    function changeOfferValue(uint48 offerId, uint48 finishTime) external payable override {
+    function changeOfferValue(uint48 offerId, uint48 offerTime) external payable override {
         require(_offerMap[offerId].value > 0, "OfferReward: offer is finished");
         require(_offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
-        require(finishTime >= _offerMap[offerId].finishTime, "OfferReward: finishTime can not be less than before");
-        if (finishTime > _offerMap[offerId].finishTime) {
-            _offerMap[offerId].finishTime = finishTime;
+        uint48 newFinishTime = uint48(block.timestamp + offerTime);
+        require(newFinishTime >= _offerMap[offerId].finishTime, "OfferReward: offerTime can not be less than before");
+        if (newFinishTime > _offerMap[offerId].finishTime) {
+            _offerMap[offerId].finishTime = newFinishTime;
         }
         if (msg.value > 0) {
             _offerMap[offerId].value += msg.value;

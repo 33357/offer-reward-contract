@@ -179,7 +179,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
   async publishOffer(
     title: string,
     content: string,
-    finishTime: number,
+    offerTime: number,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
@@ -189,7 +189,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     const gas = await this._contract.estimateGas.publishOffer(
       title,
       content,
-      finishTime,
+      offerTime,
       {
         ...config
       }
@@ -197,7 +197,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     const transaction = await this._contract.publishOffer(
       title,
       content,
-      finishTime,
+      offerTime,
       {
         gasLimit: gas.mul(13).div(10),
         ...config
@@ -356,7 +356,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
 
   async changeOfferValue(
     offerId: number,
-    finishTime: number,
+    offerTime: number,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<void> {
@@ -365,14 +365,14 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     }
     const gas = await this._contract.estimateGas.changeOfferValue(
       offerId,
-      finishTime,
+      offerTime,
       {
         ...config
       }
     );
     const transaction = await this._contract.changeOfferValue(
       offerId,
-      finishTime,
+      offerTime,
       {
         gasLimit: gas.mul(13).div(10),
         ...config

@@ -2,8 +2,7 @@ import {
   CallOverrides,
   PayableOverrides,
   BigNumber,
-  Signer,
-  BytesLike
+  Signer
 } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { OfferRewardModel } from '../model';
@@ -74,7 +73,7 @@ export interface OfferRewardClient {
   publishOffer(
     title: string,
     content: string,
-    finishTime: number,
+    offerTime: number,
     config?: PayableOverrides
   ): Promise<OfferRewardModel.OfferPublishedEvent>;
 
