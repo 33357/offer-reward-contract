@@ -174,6 +174,20 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     });
   }
 
+  getRewardOfferIdListByPublisher(
+    publisher: string,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getRewardOfferIdListByPublisher(publisher, start, length, {
+      ...config
+    });
+  }
+
   /* ================ TRANSACTION FUNCTIONS ================ */
 
   async publishOffer(

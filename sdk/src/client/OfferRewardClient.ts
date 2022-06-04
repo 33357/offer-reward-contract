@@ -68,6 +68,13 @@ export interface OfferRewardClient {
     config?: CallOverrides
   ): Promise<number[]>;
 
+  getRewardOfferIdListByPublisher(
+    publisher: string,
+    start: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]>;
+
   /* ================ TRANSACTION FUNCTIONS ================ */
 
   publishOffer(

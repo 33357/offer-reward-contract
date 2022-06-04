@@ -80,6 +80,12 @@ interface IOfferReward {
         uint48 length
     ) external view returns (uint48[] memory);
 
+    function getRewardOfferIdListByPublisher(
+        address publisher,
+        uint48 start,
+        uint48 length
+    ) external view returns (uint48[] memory);
+
     /* ================ TRANSACTION FUNCTIONS ================ */
 
     function publishOffer(

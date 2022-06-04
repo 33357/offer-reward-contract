@@ -106,6 +106,18 @@ contract OfferReward is IOfferReward, Ownable {
         return offerIdList;
     }
 
+    function getRewardOfferIdListByPublisher(
+        address publisher,
+        uint48 start,
+        uint48 length
+    ) public view override returns (uint48[] memory) {
+        uint48[] memory rewardOfferIdList = new uint48[](length);
+        for (uint48 i = 0; i < length; i++) {
+            rewardOfferIdList[i] = _publisherMap[publisher].rewardOfferIdList[start + i];
+        }
+        return rewardOfferIdList;
+    }
+
     /* ================ TRANSACTION FUNCTIONS ================ */
 
     function publishOffer(
@@ -115,15 +127,10 @@ contract OfferReward is IOfferReward, Ownable {
     ) external payable override {
         require(offerTime >= minFinshTime, "OfferReward: offerTime is too short");
         require(msg.value >= minOfferValue, "OfferReward: value is too low");
-        _offerMap[offerLength] = Offer({
-            value: msg.value,
-            offerBlock: uint48(block.number),
-            finishTime: uint48(block.timestamp + offerTime),
-            publisher: msg.sender,
-            answerAmount: 0,
-            finishBlock: 0,
-            answerBlockList: new uint48[](0)
-        });
+        _offerMap[offerLength].value = msg.value;
+        _offerMap[offerLength].offerBlock = uint48(block.number);
+        _offerMap[offerLength].finishTime = uint48(block.timestamp + offerTime);
+        _offerMap[offerLength].publisher = msg.sender;
         _publisherMap[msg.sender].publishOfferAmount++;
         _publisherMap[msg.sender].publishOfferValue += msg.value;
         _publisherMap[msg.sender].offerIdList.push(offerLength);
