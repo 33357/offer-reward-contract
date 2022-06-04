@@ -44,6 +44,7 @@ export interface OfferData {
 
 export interface Publisher {
   offerIdList: number[];
+  rewardOfferIdList: number[];
   publishOfferAmount: number;
   rewardOfferAmount: number;
   publishAnswerAmount: number;
@@ -55,6 +56,7 @@ export interface Publisher {
 
 export interface PublisherData {
   offerIdListLength: number;
+  rewardOfferIdListLength: number;
   publishOfferAmount: number;
   rewardOfferAmount: number;
   publishAnswerAmount: number;

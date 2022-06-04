@@ -34,6 +34,7 @@ interface IOfferReward {
 
     struct Publisher {
         uint48[] offerIdList;
+        uint48 [] rewardOfferIdList;
         uint48 publishOfferAmount;
         uint48 rewardOfferAmount;
         uint48 publishAnswerAmount;
@@ -45,6 +46,7 @@ interface IOfferReward {
 
     struct PublisherData {
         uint48 offerIdListLength;
+        uint48 rewardOfferIdListLength;
         uint48 publishOfferAmount;
         uint48 rewardOfferAmount;
         uint48 publishAnswerAmount;

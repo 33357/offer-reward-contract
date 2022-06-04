@@ -49,6 +49,7 @@ contract OfferReward is IOfferReward, Ownable {
     function getPublisherData(address publisher) public view override returns (PublisherData memory) {
         PublisherData memory publisherData = PublisherData({
             offerIdListLength: uint48(_publisherMap[publisher].offerIdList.length),
+            rewardOfferIdListLength: uint48(_publisherMap[publisher].rewardOfferIdList.length),
             publishOfferAmount: _publisherMap[publisher].publishOfferAmount,
             rewardOfferAmount: _publisherMap[publisher].rewardOfferAmount,
             publishAnswerAmount: _publisherMap[publisher].publishAnswerAmount,
@@ -173,6 +174,7 @@ contract OfferReward is IOfferReward, Ownable {
             _publisherMap[_offerMap[offerId].publisher].rewardOfferValue += _offerMap[offerId].value;
             _publisherMap[rewarder].rewardAnswerAmount++;
             _publisherMap[rewarder].rewardAnswerValue += _offerMap[offerId].value;
+            _publisherMap[rewarder].rewardOfferIdList.push(offerId);
             _offerMap[offerId].value = 0;
             _offerMap[offerId].finishBlock = uint48(block.number);
             (bool success, ) = feeAddress.call{value: feeAmount}("");
