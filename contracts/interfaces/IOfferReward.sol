@@ -34,7 +34,7 @@ interface IOfferReward {
 
     struct Publisher {
         uint48[] offerIdList;
-        uint48 [] rewardOfferIdList;
+        uint48[] rewardOfferIdList;
         uint48 publishOfferAmount;
         uint48 rewardOfferAmount;
         uint48 publishAnswerAmount;
@@ -91,7 +91,9 @@ interface IOfferReward {
     function publishOffer(
         string calldata title,
         string calldata content,
-        uint48 finishTime
+        uint48 finishTime,
+        uint48 beforeValueSortOfferId,
+        uint48 beforeFinishSortOfferId
     ) external payable;
 
     function publishAnswer(uint48 offerId, string calldata content) external;
@@ -104,5 +106,12 @@ interface IOfferReward {
         string calldata content
     ) external;
 
-    function changeOfferValue(uint48 offerId, uint48 finishTime) external payable;
+    function changeOfferValue(
+        uint48 offerId,
+        uint48 finishTime,
+        uint48 oldBeforeSortOfferId,
+        uint48 oldBeforeFinishOfferId,
+        uint48 newBeforeSortOfferId,
+        uint48 newBeforeFinishOfferId
+    ) external payable;
 }
