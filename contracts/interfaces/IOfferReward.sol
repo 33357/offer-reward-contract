@@ -57,6 +57,11 @@ interface IOfferReward {
     }
 
     /* ================ VIEW FUNCTIONS ================ */
+
+    function getOfferIdListByValueSort(uint48 startOfferId, uint48 length) external view returns (uint48[] memory);
+
+    function getOfferIdListByFinishSort(uint48 startOfferId, uint48 length) external view returns (uint48[] memory);
+
     function getOfferData(uint48 offerId) external view returns (OfferData memory);
 
     function getPublisherData(address publisher) external view returns (PublisherData memory);
