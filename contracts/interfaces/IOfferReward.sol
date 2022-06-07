@@ -103,7 +103,12 @@ interface IOfferReward {
 
     function publishAnswer(uint48 offerId, string calldata content) external;
 
-    function finishOffer(uint48 offerId, address rewarder) external;
+    function finishOffer(
+        uint48 offerId,
+        address rewarder,
+        uint48 beforeValueSortOfferId,
+        uint48 beforeFinishSortOfferId
+    ) external;
 
     function changeOfferData(
         uint48 offerId,
@@ -114,9 +119,9 @@ interface IOfferReward {
     function changeOfferValue(
         uint48 offerId,
         uint48 finishTime,
-        uint48 oldBeforeSortOfferId,
-        uint48 oldBeforeFinishOfferId,
-        uint48 newBeforeSortOfferId,
-        uint48 newBeforeFinishOfferId
+        uint48 oldBeforeValueSortOfferId,
+        uint48 oldBeforeFinishSortOfferId,
+        uint48 newBeforeValueSortOfferId,
+        uint48 newBeforeFinishSortOfferId
     ) external payable;
 }

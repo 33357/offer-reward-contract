@@ -8,14 +8,12 @@ contract OfferReward is IOfferReward, Ownable {
     mapping(uint48 => Offer) private _offerMap;
     mapping(address => Publisher) private _publisherMap;
 
-    // uint48[] private _fastValueSortIndexList;
-    // uint48[] private _fastValueSortOfferIdList;
     mapping(uint48 => uint48) private _valueSortOfferIdMap;
-    // uint48[] private _fastFinishSortList;
     mapping(uint48 => uint48) private _finishSortOfferIdMap;
 
     uint48 public firstValueSortOfferId;
     uint48 public firstFinishSortOfferId;
+    uint48 public sortLength;
     uint48 public offerLength;
     uint48 public minFinshTime = 1 hours;
     uint48 public waitTime = 7 days;
@@ -30,59 +28,6 @@ contract OfferReward is IOfferReward, Ownable {
     }
 
     /* ================ UTIL FUNCTIONS ================ */
-
-    // function _getFastSortMapOfferId(
-    //     uint48[] storage fastSortIndexList,
-    //     uint48[] storage fastSortOfferIdList,
-    //     mapping(uint48 => uint48) storage sortOfferIdMap,
-    //     uint48 index
-    // ) internal view returns (uint48) {
-    //     uint48 fastIndex;
-    //     uint48 fastOfferId;
-    //     for (uint48 i = 0; i < fastSortIndexList.length; i++) {
-    //         fastIndex += fastSortIndexList[i];
-    //         if (index - fastIndex <= fastSkip) {
-    //             fastOfferId = fastSortOfferIdList[i];
-    //             break;
-    //         }
-    //     }
-    //     uint48 offerId = fastOfferId;
-    //     uint48 length = index - fastIndex;
-    //     for (uint48 i = 0; i < length; i++) {
-    //         offerId = sortOfferIdMap[offerId];
-    //     }
-    //     return offerId;
-    // }
-
-    // function _getValueIndex(
-    //     uint48[] storage fastSortIndexList,
-    //     uint48[] storage fastSortOfferIdList,
-    //     mapping(uint48 => uint48) storage sortOfferIdMap,
-    //     uint48 value
-    // ) internal view returns (uint48) {
-    //     uint48 low;
-    //     uint48 high = offerLength - 1;
-    //     uint48 index;
-    //     while (low <= high) {
-    //         uint48 mid = (low + high) / 2;
-    //         uint48 guess = _getFastSortMapOfferId(fastSortIndexList, fastSortOfferIdList, sortOfferIdMap, mid);
-    //         if (guess == value) {
-    //             index = mid;
-    //             break;
-    //         }
-    //         if (guess > value) {
-    //             high = mid - 1;
-    //         }
-    //         if (guess < value) {
-    //             low = mid + 1;
-    //         }
-    //     }
-    //     return index;
-    // }
-
-    // function _setFastSort(){
-
-    // }
 
     function _addSort(
         uint48 beforeValueSortOfferId,
@@ -119,6 +64,7 @@ contract OfferReward is IOfferReward, Ownable {
             _finishSortOfferIdMap[offerId] = _finishSortOfferIdMap[beforeFinishSortOfferId];
             _finishSortOfferIdMap[beforeFinishSortOfferId] = offerId;
         }
+        sortLength++;
     }
 
     function _removeSort(
@@ -133,6 +79,7 @@ contract OfferReward is IOfferReward, Ownable {
             "OfferReward: error beforeFinishSortOfferId"
         );
         _finishSortOfferIdMap[beforeFinishSortOfferId] = _finishSortOfferIdMap[offerId];
+        sortLength--;
     }
 
     /* ================ VIEW FUNCTIONS ================ */
@@ -290,7 +237,12 @@ contract OfferReward is IOfferReward, Ownable {
         emit AnswerPublished(offerId, msg.sender, content);
     }
 
-    function finishOffer(uint48 offerId, address rewarder) external {
+    function finishOffer(
+        uint48 offerId,
+        address rewarder,
+        uint48 beforeValueSortOfferId,
+        uint48 beforeFinishSortOfferId
+    ) external {
         require(_offerMap[offerId].value > 0, "OfferReward: offer is finished");
         emit OfferFinished(offerId, rewarder, _offerMap[offerId].value);
         if (rewarder == address(0)) {
@@ -327,6 +279,7 @@ contract OfferReward is IOfferReward, Ownable {
             (success, ) = rewarder.call{value: rewardAmount}("");
             require(success, "OfferReward: send reward failed");
         }
+        _removeSort(beforeValueSortOfferId, beforeFinishSortOfferId, offerId);
     }
 
     function changeOfferData(
@@ -343,10 +296,10 @@ contract OfferReward is IOfferReward, Ownable {
     function changeOfferValue(
         uint48 offerId,
         uint48 offerTime,
-        uint48 oldBeforeSortOfferId,
-        uint48 oldBeforeFinishOfferId,
-        uint48 newBeforeSortOfferId,
-        uint48 newBeforeFinishOfferId
+        uint48 oldBeforeValueSortOfferId,
+        uint48 oldBeforeFinishSortOfferId,
+        uint48 newBeforeValueSortOfferId,
+        uint48 newBeforeFinishSortOfferId
     ) external payable override {
         require(_offerMap[offerId].value > 0, "OfferReward: offer is finished");
         require(_offerMap[offerId].publisher == msg.sender, "OfferReward: you are not the publisher");
@@ -358,8 +311,14 @@ contract OfferReward is IOfferReward, Ownable {
         if (msg.value > 0) {
             _offerMap[offerId].value += msg.value;
         }
-        _removeSort(oldBeforeSortOfferId, oldBeforeFinishOfferId, offerId);
-        _addSort(newBeforeSortOfferId, newBeforeFinishOfferId, offerId, _offerMap[offerId].value, newFinishTime);
+        _removeSort(oldBeforeValueSortOfferId, oldBeforeFinishSortOfferId, offerId);
+        _addSort(
+            newBeforeValueSortOfferId,
+            newBeforeFinishSortOfferId,
+            offerId,
+            _offerMap[offerId].value,
+            newFinishTime
+        );
     }
 
     /* ================ ADMIN FUNCTIONS ================ */
