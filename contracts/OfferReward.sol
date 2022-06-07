@@ -14,8 +14,8 @@ contract OfferReward is IOfferReward, Ownable {
     // uint48[] private _fastFinishSortList;
     mapping(uint48 => uint48) private _finishSortOfferIdMap;
 
-    uint48 firstValueSortOfferId;
-    uint48 firstFinishSortOfferId;
+    uint48 public firstValueSortOfferId;
+    uint48 public firstFinishSortOfferId;
     uint48 public fastSkip = 1000;
     uint48 public offerLength;
     uint48 public minFinshTime = 1 hours;
