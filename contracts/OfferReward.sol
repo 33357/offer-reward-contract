@@ -16,7 +16,6 @@ contract OfferReward is IOfferReward, Ownable {
 
     uint48 public firstValueSortOfferId;
     uint48 public firstFinishSortOfferId;
-    uint48 public fastSkip = 1000;
     uint48 public offerLength;
     uint48 public minFinshTime = 1 hours;
     uint48 public waitTime = 7 days;
