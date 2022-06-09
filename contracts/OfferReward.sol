@@ -38,7 +38,7 @@ contract OfferReward is IOfferReward, Ownable {
         if (beforeValueSortOfferId == 0) {
             if (firstValueSortOfferId != 0) {
                 require(
-                    _offerMap[offerId].value >= _offerMap[firstValueSortOfferId].value,
+                    _offerMap[firstValueSortOfferId].value <= _offerMap[offerId].value,
                     "OfferReward: value sort error"
                 );
             }
@@ -46,7 +46,7 @@ contract OfferReward is IOfferReward, Ownable {
             firstValueSortOfferId = offerId;
         } else if (_valueSortOfferIdMap[beforeValueSortOfferId] == 0) {
             require(
-                _offerMap[offerId].value >= _offerMap[firstValueSortOfferId].value,
+                _offerMap[firstValueSortOfferId].value >= _offerMap[offerId].value,
                 "OfferReward: value sort error"
             );
             _valueSortOfferIdMap[beforeValueSortOfferId] = offerId;
@@ -65,7 +65,7 @@ contract OfferReward is IOfferReward, Ownable {
         if (beforeFinishSortOfferId == 0) {
             if (firstFinishSortOfferId != 0) {
                 require(
-                    _offerMap[offerId].finishTime <= _offerMap[firstFinishSortOfferId].finishTime,
+                    _offerMap[firstFinishSortOfferId].finishTime >= _offerMap[offerId].finishTime,
                     "OfferReward: finishTime sort error"
                 );
             }
@@ -73,7 +73,7 @@ contract OfferReward is IOfferReward, Ownable {
             firstFinishSortOfferId = offerId;
         } else if (_finishSortOfferIdMap[beforeFinishSortOfferId] == 0) {
             require(
-                _offerMap[offerId].finishTime <= _offerMap[beforeFinishSortOfferId].finishTime,
+                _offerMap[beforeFinishSortOfferId].finishTime <= _offerMap[offerId].finishTime,
                 "OfferReward: finishTime sort error"
             );
             _finishSortOfferIdMap[beforeFinishSortOfferId] = offerId;
@@ -248,11 +248,10 @@ contract OfferReward is IOfferReward, Ownable {
     ) external payable override {
         require(offerTime >= minOfferTime && offerTime <= maxOfferTime, "OfferReward: error offerTime");
         require(msg.value >= minOfferValue, "OfferReward: value is too low");
-        uint48 finishTime = uint48(block.timestamp + offerTime);
         offerLength++;
         _offerMap[offerLength].value = msg.value;
         _offerMap[offerLength].offerBlock = uint48(block.number);
-        _offerMap[offerLength].finishTime = finishTime;
+        _offerMap[offerLength].finishTime = uint48(block.timestamp + offerTime);
         _offerMap[offerLength].publisher = msg.sender;
         _publisherMap[msg.sender].publishOfferAmount++;
         _publisherMap[msg.sender].publishOfferValue += msg.value;
