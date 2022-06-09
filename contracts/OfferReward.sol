@@ -32,17 +32,15 @@ contract OfferReward is IOfferReward, Ownable {
     function _addSort(
         uint48 beforeValueSortOfferId,
         uint48 beforeFinishSortOfferId,
-        uint48 offerId,
-        uint256 value,
-        uint48 finishTime
+        uint48 offerId
     ) internal {
         if (beforeValueSortOfferId == 0) {
-            require(value >= _offerMap[firstValueSortOfferId].value, "value sort error");
+            require(_offerMap[offerId].value >= _offerMap[firstValueSortOfferId].value, "value sort error");
             firstValueSortOfferId = offerId;
         } else {
             require(
-                _offerMap[beforeValueSortOfferId].value >= value &&
-                    _offerMap[_valueSortOfferIdMap[beforeValueSortOfferId]].value <= value &&
+                _offerMap[beforeValueSortOfferId].value >= _offerMap[offerId].value &&
+                    _offerMap[_valueSortOfferIdMap[beforeValueSortOfferId]].value <= _offerMap[offerId].value &&
                     _offerMap[beforeValueSortOfferId].value !=
                     _offerMap[_valueSortOfferIdMap[beforeValueSortOfferId]].value,
                 "OfferReward: error valueSort"
@@ -51,12 +49,12 @@ contract OfferReward is IOfferReward, Ownable {
             _valueSortOfferIdMap[beforeValueSortOfferId] = offerId;
         }
         if (beforeFinishSortOfferId == 0) {
-            require(finishTime >= _offerMap[firstFinishSortOfferId].finishTime, "finishTime sort error");
+            require(_offerMap[offerId].finishTime >= _offerMap[firstFinishSortOfferId].finishTime, "finishTime sort error");
             firstFinishSortOfferId = offerId;
         } else {
             require(
-                _offerMap[beforeFinishSortOfferId].finishTime <= finishTime &&
-                    _offerMap[_finishSortOfferIdMap[beforeFinishSortOfferId]].finishTime >= finishTime &&
+                _offerMap[beforeFinishSortOfferId].finishTime <= _offerMap[offerId].finishTime &&
+                    _offerMap[_finishSortOfferIdMap[beforeFinishSortOfferId]].finishTime >= _offerMap[offerId].finishTime &&
                     _offerMap[beforeFinishSortOfferId].finishTime !=
                     _offerMap[_finishSortOfferIdMap[beforeFinishSortOfferId]].finishTime,
                 "OfferReward: error finishSort"
@@ -72,13 +70,27 @@ contract OfferReward is IOfferReward, Ownable {
         uint48 beforeFinishSortOfferId,
         uint48 offerId
     ) internal {
-        require(_valueSortOfferIdMap[beforeValueSortOfferId] == offerId, "OfferReward: error beforeValueSortOfferId");
-        _valueSortOfferIdMap[beforeValueSortOfferId] = _valueSortOfferIdMap[offerId];
-        require(
-            _finishSortOfferIdMap[beforeFinishSortOfferId] == offerId,
-            "OfferReward: error beforeFinishSortOfferId"
-        );
-        _finishSortOfferIdMap[beforeFinishSortOfferId] = _finishSortOfferIdMap[offerId];
+        if (beforeValueSortOfferId == 0) {
+            require(firstValueSortOfferId == offerId, "OfferReward: error beforeValueSortOfferId");
+            firstValueSortOfferId = _valueSortOfferIdMap[firstValueSortOfferId];
+        } else {
+            require(
+                _valueSortOfferIdMap[beforeValueSortOfferId] == offerId,
+                "OfferReward: error beforeValueSortOfferId"
+            );
+            _valueSortOfferIdMap[beforeValueSortOfferId] = _valueSortOfferIdMap[offerId];
+        }
+
+        if (beforeFinishSortOfferId == 0) {
+            require(firstFinishSortOfferId == offerId, "OfferReward: error beforeFinishSortOfferId");
+            firstFinishSortOfferId = _finishSortOfferIdMap[firstFinishSortOfferId];
+        } else {
+            require(
+                _finishSortOfferIdMap[beforeFinishSortOfferId] == offerId,
+                "OfferReward: error beforeFinishSortOfferId"
+            );
+            _finishSortOfferIdMap[beforeFinishSortOfferId] = _finishSortOfferIdMap[offerId];
+        }
         sortLength--;
     }
 
@@ -219,7 +231,7 @@ contract OfferReward is IOfferReward, Ownable {
         _publisherMap[msg.sender].publishOfferAmount++;
         _publisherMap[msg.sender].publishOfferValue += msg.value;
         _publisherMap[msg.sender].offerIdList.push(offerLength);
-        _addSort(beforeValueSortOfferId, beforeFinishSortOfferId, offerLength, msg.value, finishTime);
+        _addSort(beforeValueSortOfferId, beforeFinishSortOfferId, offerLength);
         emit OfferPublished(offerLength, title, content);
     }
 
@@ -315,9 +327,7 @@ contract OfferReward is IOfferReward, Ownable {
         _addSort(
             newBeforeValueSortOfferId,
             newBeforeFinishSortOfferId,
-            offerId,
-            _offerMap[offerId].value,
-            newFinishTime
+            offerId
         );
     }
 
