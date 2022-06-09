@@ -15,7 +15,8 @@ contract OfferReward is IOfferReward, Ownable {
     uint48 public firstFinishSortOfferId;
     uint48 public sortLength;
     uint48 public offerLength;
-    uint48 public minFinshTime = 1 hours;
+    uint48 public minOfferTime = 1 hours;
+    uint48 public maxOfferTime = 30 days;
     uint48 public waitTime = 7 days;
     uint48 public blockSkip = 5000;
     uint48 public feeRate = 500;
@@ -49,12 +50,16 @@ contract OfferReward is IOfferReward, Ownable {
             _valueSortOfferIdMap[beforeValueSortOfferId] = offerId;
         }
         if (beforeFinishSortOfferId == 0) {
-            require(_offerMap[offerId].finishTime >= _offerMap[firstFinishSortOfferId].finishTime, "finishTime sort error");
+            require(
+                _offerMap[offerId].finishTime >= _offerMap[firstFinishSortOfferId].finishTime,
+                "finishTime sort error"
+            );
             firstFinishSortOfferId = offerId;
         } else {
             require(
                 _offerMap[beforeFinishSortOfferId].finishTime <= _offerMap[offerId].finishTime &&
-                    _offerMap[_finishSortOfferIdMap[beforeFinishSortOfferId]].finishTime >= _offerMap[offerId].finishTime &&
+                    _offerMap[_finishSortOfferIdMap[beforeFinishSortOfferId]].finishTime >=
+                    _offerMap[offerId].finishTime &&
                     _offerMap[beforeFinishSortOfferId].finishTime !=
                     _offerMap[_finishSortOfferIdMap[beforeFinishSortOfferId]].finishTime,
                 "OfferReward: error finishSort"
@@ -220,7 +225,7 @@ contract OfferReward is IOfferReward, Ownable {
         uint48 beforeValueSortOfferId,
         uint48 beforeFinishSortOfferId
     ) external payable override {
-        require(offerTime >= minFinshTime, "OfferReward: offerTime is too short");
+        require(offerTime >= minOfferTime && offerTime <= maxOfferTime, "OfferReward: error offerTime");
         require(msg.value >= minOfferValue, "OfferReward: value is too low");
         uint48 finishTime = uint48(block.timestamp + offerTime);
         offerLength++;
@@ -324,11 +329,7 @@ contract OfferReward is IOfferReward, Ownable {
             _offerMap[offerId].value += msg.value;
         }
         _removeSort(oldBeforeValueSortOfferId, oldBeforeFinishSortOfferId, offerId);
-        _addSort(
-            newBeforeValueSortOfferId,
-            newBeforeFinishSortOfferId,
-            offerId
-        );
+        _addSort(newBeforeValueSortOfferId, newBeforeFinishSortOfferId, offerId);
     }
 
     /* ================ ADMIN FUNCTIONS ================ */
@@ -349,8 +350,12 @@ contract OfferReward is IOfferReward, Ownable {
         answerFee = newAnswerFee;
     }
 
-    function setMinFinshTime(uint48 newMinFinshTime) external onlyOwner {
-        minFinshTime = newMinFinshTime;
+    function setMinOfferTime(uint48 newMinOfferTime) external onlyOwner {
+        minOfferTime = newMinOfferTime;
+    }
+
+    function setMaxOfferTime(uint48 newMaxOfferTime) external onlyOwner {
+        maxOfferTime = newMaxOfferTime;
     }
 
     function setBlockSkip(uint48 newBlockSkip) external onlyOwner {
