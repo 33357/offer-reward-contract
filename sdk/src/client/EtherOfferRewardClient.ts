@@ -48,6 +48,41 @@ export class EtherOfferRewardClient implements OfferRewardClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
+  getFirstValueSortOfferId(config?: CallOverrides): Promise<number> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.firstValueSortOfferId({ ...config });
+  }
+
+  getFirstFinishSortOfferId(config?: CallOverrides): Promise<number> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.firstFinishSortOfferId({ ...config });
+  }
+
+  getSortLength(config?: CallOverrides): Promise<number> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.sortLength({ ...config });
+  }
+
+  getMinOfferTime(config?: CallOverrides): Promise<number> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.minOfferTime({ ...config });
+  }
+
+  getMaxOfferTime(config?: CallOverrides): Promise<number> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.maxOfferTime({ ...config });
+  }
+
   getWaitTime(config?: CallOverrides): Promise<number> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
@@ -55,35 +90,28 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     return this._contract.waitTime({ ...config });
   }
 
-  getMinFinshTime(config?: CallOverrides): Promise<number>{
-    if (!this._contract) {
-      throw new Error(`${this._errorTitle}: no contract`);
-    }
-    return this._contract.minFinshTime({ ...config });
-  }
-  
-  getFeeRate(config?: CallOverrides): Promise<number>{
+  getFeeRate(config?: CallOverrides): Promise<number> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
     return this._contract.feeRate({ ...config });
   }
 
-  getFeeAddress(config?: CallOverrides): Promise<string>{
+  getFeeAddress(config?: CallOverrides): Promise<string> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
     return this._contract.feeAddress({ ...config });
   }
 
-  getMinOfferValue(config?: CallOverrides): Promise<BigNumber>{
+  getMinOfferValue(config?: CallOverrides): Promise<BigNumber> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
     return this._contract.minOfferValue({ ...config });
   }
 
-  getAnswerFee(config?: CallOverrides): Promise<BigNumber>{
+  getAnswerFee(config?: CallOverrides): Promise<BigNumber> {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
@@ -102,6 +130,32 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       throw new Error(`${this._errorTitle}: no contract`);
     }
     return this._contract.offerLength({ ...config });
+  }
+
+  getOfferIdListByValueSort(
+    startOfferId: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getOfferIdListByValueSort(startOfferId, length, {
+      ...config
+    });
+  }
+
+  getOfferIdListByFinishSort(
+    startOfferId: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]> {
+    if (!this._contract) {
+      throw new Error(`${this._errorTitle}: no contract`);
+    }
+    return this._contract.getOfferIdListByFinishSort(startOfferId, length, {
+      ...config
+    });
   }
 
   getOfferData(
@@ -183,9 +237,14 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     if (!this._contract) {
       throw new Error(`${this._errorTitle}: no contract`);
     }
-    return this._contract.getRewardOfferIdListByPublisher(publisher, start, length, {
-      ...config
-    });
+    return this._contract.getRewardOfferIdListByPublisher(
+      publisher,
+      start,
+      length,
+      {
+        ...config
+      }
+    );
   }
 
   /* ================ TRANSACTION FUNCTIONS ================ */
@@ -194,6 +253,8 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     title: string,
     content: string,
     offerTime: number,
+    beforeValueSortOfferId: number,
+    beforeFinishSortOfferId: number,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
@@ -204,6 +265,8 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       title,
       content,
       offerTime,
+      beforeValueSortOfferId,
+      beforeFinishSortOfferId,
       {
         ...config
       }
@@ -212,6 +275,8 @@ export class EtherOfferRewardClient implements OfferRewardClient {
       title,
       content,
       offerTime,
+      beforeValueSortOfferId,
+      beforeFinishSortOfferId,
       {
         gasLimit: gas.mul(13).div(10),
         ...config
@@ -282,6 +347,8 @@ export class EtherOfferRewardClient implements OfferRewardClient {
   async finishOffer(
     offerId: number,
     rewarder: string,
+    beforeValueSortOfferId: number,
+    beforeFinishSortOfferId: number,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferFinishedEvent> {
@@ -291,14 +358,22 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     const gas = await this._contract.estimateGas.finishOffer(
       offerId,
       rewarder,
+      beforeValueSortOfferId,
+      beforeFinishSortOfferId,
       {
         ...config
       }
     );
-    const transaction = await this._contract.finishOffer(offerId, rewarder, {
-      gasLimit: gas.mul(13).div(10),
-      ...config
-    });
+    const transaction = await this._contract.finishOffer(
+      offerId,
+      rewarder,
+      beforeValueSortOfferId,
+      beforeFinishSortOfferId,
+      {
+        gasLimit: gas.mul(13).div(10),
+        ...config
+      }
+    );
     if (callback) {
       callback(transaction);
     }
@@ -371,6 +446,10 @@ export class EtherOfferRewardClient implements OfferRewardClient {
   async changeOfferValue(
     offerId: number,
     offerTime: number,
+    oldBeforeValueSortOfferId: number,
+    oldBeforeFinishSortOfferId: number,
+    newBeforeValueSortOfferId: number,
+    newBeforeFinishSortOfferId: number,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<void> {
@@ -380,6 +459,10 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     const gas = await this._contract.estimateGas.changeOfferValue(
       offerId,
       offerTime,
+      oldBeforeValueSortOfferId,
+      oldBeforeFinishSortOfferId,
+      newBeforeValueSortOfferId,
+      newBeforeFinishSortOfferId,
       {
         ...config
       }
@@ -387,6 +470,10 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     const transaction = await this._contract.changeOfferValue(
       offerId,
       offerTime,
+      oldBeforeValueSortOfferId,
+      oldBeforeFinishSortOfferId,
+      newBeforeValueSortOfferId,
+      newBeforeFinishSortOfferId,
       {
         gasLimit: gas.mul(13).div(10),
         ...config
@@ -430,12 +517,12 @@ export class EtherOfferRewardClient implements OfferRewardClient {
     rewarder: string | undefined,
     from: number,
     to: number
-  ): Promise<OfferRewardModel.OfferFinishedEvent>{
+  ): Promise<OfferRewardModel.OfferFinishedEvent> {
     if (!this._contract) {
       return Promise.reject('need to connect a valid provider');
     }
     const res = await this._contract.queryFilter(
-      this._contract.filters.OfferFinished(offerId,rewarder),
+      this._contract.filters.OfferFinished(offerId, rewarder),
       from,
       to
     );

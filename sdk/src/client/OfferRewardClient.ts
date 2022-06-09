@@ -1,9 +1,4 @@
-import {
-  CallOverrides,
-  PayableOverrides,
-  BigNumber,
-  Signer
-} from 'ethers';
+import { CallOverrides, PayableOverrides, BigNumber, Signer } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { OfferRewardModel } from '../model';
 
@@ -18,10 +13,18 @@ export interface OfferRewardClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
+  getFirstValueSortOfferId(config?: CallOverrides): Promise<number>;
+
+  getFirstFinishSortOfferId(config?: CallOverrides): Promise<number>;
+
+  getSortLength(config?: CallOverrides): Promise<number>;
+
   getWaitTime(config?: CallOverrides): Promise<number>;
 
-  getMinFinshTime(config?: CallOverrides): Promise<number>;
-  
+  getMinOfferTime(config?: CallOverrides): Promise<number>;
+
+  getMaxOfferTime(config?: CallOverrides): Promise<number>;
+
   getFeeRate(config?: CallOverrides): Promise<number>;
 
   getFeeAddress(config?: CallOverrides): Promise<string>;
@@ -33,6 +36,18 @@ export interface OfferRewardClient {
   getBlockSkip(config?: CallOverrides): Promise<number>;
 
   getOfferLength(config?: CallOverrides): Promise<number>;
+
+  getOfferIdListByValueSort(
+    startOfferId: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]>;
+
+  getOfferIdListByFinishSort(
+    startOfferId: number,
+    length: number,
+    config?: CallOverrides
+  ): Promise<number[]>;
 
   getOfferData(
     offerId: number,
@@ -81,12 +96,23 @@ export interface OfferRewardClient {
     title: string,
     content: string,
     offerTime: number,
+    beforeValueSortOfferId: number,
+    beforeFinishSortOfferId: number,
     config?: PayableOverrides
   ): Promise<OfferRewardModel.OfferPublishedEvent>;
+
+  publishAnswer(
+    offerId: number,
+    content: string,
+    config?: PayableOverrides,
+    callback?: Function
+  ): Promise<OfferRewardModel.AnswerPublishedEvent>;
 
   finishOffer(
     offerId: number,
     rewarder: string,
+    beforeValueSortOfferId: number,
+    beforeFinishSortOfferId: number,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<OfferRewardModel.OfferFinishedEvent>;
@@ -102,6 +128,10 @@ export interface OfferRewardClient {
   changeOfferValue(
     offerId: number,
     finishTime: number,
+    oldBeforeValueSortOfferId: number,
+    oldBeforeFinishSortOfferId: number,
+    newBeforeValueSortOfferId: number,
+    newBeforeFinishSortOfferId: number,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<void>;

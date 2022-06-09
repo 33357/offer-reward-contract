@@ -31,7 +31,6 @@ export interface Offer {
   answerBlockList: number[];
 }
 
-
 export interface OfferData {
   value: BigNumber;
   offerBlock: number;
