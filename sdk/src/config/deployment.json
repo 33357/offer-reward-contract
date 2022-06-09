@@ -1,12 +1,12 @@
 {
   "97": {
     "OfferReward": {
-      "proxyAddress": "0xB3d23A2Db8ed7CB1d38102Fa019c04857e2c96E0",
-      "implAddress": "0xB3d23A2Db8ed7CB1d38102Fa019c04857e2c96E0",
+      "proxyAddress": "0xC3274c1b80Ad51C2B4A12AE16f0961D5C6e4FBa1",
+      "implAddress": "0xC3274c1b80Ad51C2B4A12AE16f0961D5C6e4FBa1",
       "version": "1.0.0",
       "contract": "OfferReward",
       "operator": "0x7609C6831a540fC56281F579d2cEE7e60EBEa489",
-      "fromBlock": 20044312
+      "fromBlock": 20046863
     }
   }
 }

@@ -37,30 +37,46 @@ contract OfferReward is IOfferReward, Ownable {
     ) internal {
         if (beforeValueSortOfferId == 0) {
             if (firstValueSortOfferId != 0) {
-                require(_offerMap[offerId].value >= _offerMap[firstValueSortOfferId].value, "value sort error");
+                require(
+                    _offerMap[offerId].value >= _offerMap[firstValueSortOfferId].value,
+                    "OfferReward: value sort error"
+                );
             }
             _valueSortOfferIdMap[offerId] = firstValueSortOfferId;
             firstValueSortOfferId = offerId;
+        } else if (_valueSortOfferIdMap[beforeValueSortOfferId] == 0) {
+            require(
+                _offerMap[offerId].value >= _offerMap[firstValueSortOfferId].value,
+                "OfferReward: value sort error"
+            );
+            _valueSortOfferIdMap[beforeValueSortOfferId] = offerId;
         } else {
             require(
                 _offerMap[beforeValueSortOfferId].value >= _offerMap[offerId].value &&
                     _offerMap[_valueSortOfferIdMap[beforeValueSortOfferId]].value <= _offerMap[offerId].value &&
                     _offerMap[beforeValueSortOfferId].value !=
                     _offerMap[_valueSortOfferIdMap[beforeValueSortOfferId]].value,
-                "OfferReward: error valueSort"
+                "OfferReward: value sort error"
             );
             _valueSortOfferIdMap[offerId] = _valueSortOfferIdMap[beforeValueSortOfferId];
             _valueSortOfferIdMap[beforeValueSortOfferId] = offerId;
         }
+
         if (beforeFinishSortOfferId == 0) {
             if (firstFinishSortOfferId != 0) {
                 require(
                     _offerMap[offerId].finishTime <= _offerMap[firstFinishSortOfferId].finishTime,
-                    "finishTime sort error"
+                    "OfferReward: finishTime sort error"
                 );
             }
             _finishSortOfferIdMap[offerId] = firstFinishSortOfferId;
             firstFinishSortOfferId = offerId;
+        } else if (_finishSortOfferIdMap[beforeFinishSortOfferId] == 0) {
+            require(
+                _offerMap[offerId].finishTime <= _offerMap[beforeFinishSortOfferId].finishTime,
+                "OfferReward: finishTime sort error"
+            );
+            _finishSortOfferIdMap[beforeFinishSortOfferId] = offerId;
         } else {
             require(
                 _offerMap[beforeFinishSortOfferId].finishTime <= _offerMap[offerId].finishTime &&
@@ -68,7 +84,7 @@ contract OfferReward is IOfferReward, Ownable {
                     _offerMap[offerId].finishTime &&
                     _offerMap[beforeFinishSortOfferId].finishTime !=
                     _offerMap[_finishSortOfferIdMap[beforeFinishSortOfferId]].finishTime,
-                "OfferReward: error finishSort"
+                "OfferReward: finishTime sort error"
             );
             _finishSortOfferIdMap[offerId] = _finishSortOfferIdMap[beforeFinishSortOfferId];
             _finishSortOfferIdMap[beforeFinishSortOfferId] = offerId;
