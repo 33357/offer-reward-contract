@@ -1,4 +1,4 @@
-import { CallOverrides, PayableOverrides, BigNumber, Signer } from 'ethers';
+import { CallOverrides, PayableOverrides, BigNumber, Signer, BigNumberish } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 import { OfferRewardModel } from '../model';
 
@@ -139,20 +139,20 @@ export interface OfferRewardClient {
   /* ================ EVENT FUNCTIONS ================ */
 
   getOfferPublishedEvent(
-    offerId: number | undefined,
+    offerId: BigNumberish | undefined,
     from: number,
     to: number
   ): Promise<OfferRewardModel.OfferPublishedEvent>;
 
   getOfferFinishedEvent(
-    offerId: number | undefined,
+    offerId: BigNumberish | undefined,
     rewarder: string | undefined,
     from: number,
     to: number
   ): Promise<OfferRewardModel.OfferFinishedEvent>;
 
   getAnswerPublishedEventList(
-    offerId: number | undefined,
+    offerId: BigNumberish | undefined,
     publisher: string | undefined,
     from: number,
     to: number

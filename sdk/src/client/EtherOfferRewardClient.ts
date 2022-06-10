@@ -1,5 +1,5 @@
 import { Provider } from '@ethersproject/providers';
-import { BigNumber, CallOverrides, PayableOverrides, Signer } from 'ethers';
+import { BigNumber, BigNumberish, CallOverrides, PayableOverrides, Signer } from 'ethers';
 import { OfferRewardModel } from 'src/model';
 import {
   OfferRewardClient,
@@ -491,7 +491,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
   /* ================ EVENT FUNCTIONS ================ */
 
   async getOfferPublishedEvent(
-    offerId: number | undefined,
+    offerId: BigNumberish | undefined,
     from: number,
     to: number
   ): Promise<OfferRewardModel.OfferPublishedEvent> {
@@ -513,7 +513,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
   }
 
   async getOfferFinishedEvent(
-    offerId: number | undefined,
+    offerId: BigNumberish | undefined,
     rewarder: string | undefined,
     from: number,
     to: number
@@ -536,7 +536,7 @@ export class EtherOfferRewardClient implements OfferRewardClient {
   }
 
   async getAnswerPublishedEventList(
-    offerId: number | undefined,
+    offerId: BigNumberish | undefined,
     publisher: string | undefined,
     from: number,
     to: number
