@@ -261,7 +261,7 @@ contract OfferReward is IOfferReward, Ownable {
     }
 
     function publishAnswer(uint48 offerId, string calldata content) external override {
-        require(offerId < offerLength, "OfferReward: offer is not exit");
+        require(_offerMap[offerId].finishTime > block.timestamp, "OfferReward: offer is not open");
         if (
             _offerMap[offerId].answerBlockList.length == 0 ||
             uint48(block.number) - _offerMap[offerId].answerBlockList[_offerMap[offerId].answerBlockList.length - 1] >
