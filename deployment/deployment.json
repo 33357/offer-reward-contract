@@ -1,4 +1,14 @@
 {
+  "56": {
+    "OfferReward": {
+      "proxyAddress": "0xb2148e6393dAddEb256Bdf73892b97339bD22808",
+      "implAddress": "0xb2148e6393dAddEb256Bdf73892b97339bD22808",
+      "version": "1.0.0",
+      "contract": "OfferReward",
+      "operator": "0xC1eBA887A8d418769C8200a42379Cf9E20531f2f",
+      "fromBlock": 18613462
+    }
+  },
   "97": {
     "OfferReward": {
       "proxyAddress": "0x7d4308843C4C96f1D9E255334d5425703d185EEf",
