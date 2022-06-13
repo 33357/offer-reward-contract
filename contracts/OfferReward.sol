@@ -46,7 +46,7 @@ contract OfferReward is IOfferReward, Ownable {
             firstValueSortOfferId = offerId;
         } else if (_valueSortOfferIdMap[beforeValueSortOfferId] == 0) {
             require(
-                _offerMap[firstValueSortOfferId].value >= _offerMap[offerId].value,
+                _offerMap[beforeValueSortOfferId].value >= _offerMap[offerId].value,
                 "OfferReward: value sort error"
             );
             _valueSortOfferIdMap[beforeValueSortOfferId] = offerId;
